@@ -7,11 +7,6 @@ cbuffer params : register(b0) {
 
 static const float eps = 1.0e-4;
 
-struct PS_Input {
-    float4 pos : SV_Position;
-    float2 uv : TEXCOORD;
-};
-
 float4
 mask(float4 pos : SV_Position) : SV_Target {
     const float4 src = tex.Load(int3(pos.xy, 0));
