@@ -1,0 +1,38 @@
+[project]
+name = "Diffusion_K"
+version = "0.1.0"
+author = "Korarei"
+requires-aviutl2 = "2003800"
+
+[build]
+[[build.scripts]]
+id = "effect"
+prefix = "@"
+suffix = ".anm2"
+variables = { SOURCE = "./src" }
+include_directories = ["${SOURCE}/shaders"]
+sources = [
+    { file = "${SOURCE}/blur.lua", LABEL = "ぼかし" },
+    { file = "${SOURCE}/orton.lua", LABEL = "光効果" },
+]
+
+[release]
+[release.package]
+information = "${PROJECT_NAME} v${PROJECT_VERSION} by ${PROJECT_AUTHOR}"
+license = "MIT"
+website = "https://github.com/korarei/AviUtl2_Diffusion_K_Script"
+report-issue = "https://github.com/korarei/AviUtl2_Diffusion_K_Script/issues"
+summary = "オートン効果スクリプト"
+description = """
+以下の機能が追加される
+- Orton (光効果): オートン効果
+- GaussianBlur (ぼかし): ガウシアンぼかし
+"""
+
+[[release.contents.extensions]]
+directory = "Script/${PROJECT_NAME}"
+files = ["script:effect"]
+
+[[release.contents.documents]]
+directory = "Script/${PROJECT_NAME}"
+files = ["./*.md", "./LICENSE"]
