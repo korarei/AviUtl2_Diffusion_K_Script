@@ -1,0 +1,2 @@
+# AviUtl2_Diffusion_K_Script
+オートン効果のスクリプト
