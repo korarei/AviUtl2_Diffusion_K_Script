@@ -17,6 +17,7 @@ sources = [
     { file = "${SOURCE}/orton.lua", LABEL = "光効果" },
     { file = "${SOURCE}/dissolve.lua", LABEL = "加工" },
     { file = "${SOURCE}/scatter.lua", LABEL = "加工" },
+    { file = "${SOURCE}/noise.lua", LABEL = "加工" },
 ]
 
 [release]

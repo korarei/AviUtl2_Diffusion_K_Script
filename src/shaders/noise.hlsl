@@ -1,15 +1,12 @@
 Texture2D tex : register(t0);
-SamplerState smp : register(s0);
 cbuffer params : register(b0) {
-    float2 weight;
     float2 seed;
     float amount;
-}
-
-struct PS_Input {
-    float4 pos : SV_Position;
-    float2 uv : TEXCOORD;
+    float color;
+    float should_clamp;
 };
+
+static const float eps = 1.0e-4;
 
 /*
 The following function is a modified version of pcg4d function
@@ -41,19 +38,27 @@ hash(float4 i) {
     return pcg4d(uint4(i)) / 4294967295.0;
 }
 
-float2
-box_muller(float2 p) {
-    const float4 h = hash(float4(p, seed));
-    const float r = sqrt(-2.0 * log(h.x));
-    const float t = 6.28318530718 * h.y;
-    return r * float2(cos(t), sin(t));
-}
-
 float4
-scatter(PS_Input input) : SV_Target {
-    float2 size;
-    tex.GetDimensions(size.x, size.y);
+noise(float4 pos : SV_Position) : SV_Target {
+    float4 src = tex.Load(int3(pos.xy, 0));
+    src.rgb *= rcp(max(src.a, eps));
 
-    const float2 offset = box_muller(input.pos.xy) * rcp(size) * amount * rcp(20.0);
-    return tex.Sample(smp, mad(weight, offset, input.uv));
+    const float4 r = (hash(float4(pos.xy, seed)) - 0.5) * amount;
+    [forcecase]
+    switch (int(color)) {
+        case 0:
+            src.rgb += r.rrr;
+            break;
+        case 1:
+            src.rgb += r.rgb;
+            break;
+        case 2:
+            src += r;
+            break;
+        default:
+            break;
+    }
+
+    const float4 output = float4(src.rgb, src.a);
+    return lerp(output, saturate(output), should_clamp);
 }

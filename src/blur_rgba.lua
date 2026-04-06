@@ -6,10 +6,11 @@
 --filter
 
 --group:Blurriness,true
-local blurriness_r = 0.0 --track@blurriness_r:Blurriness::R,0,8192,25,0.01,0.00,0.01
-local blurriness_g = 0.0 --track@blurriness_g:Blurriness::G,0,8192,25,0.01,0.00,0.01
-local blurriness_b = 0.0 --track@blurriness_b:Blurriness::B,0,8192,25,0.01,0.00,0.01
-local blurriness_a = 0.0 --track@blurriness_a:Blurriness::A,0,8192,25,0.01,0.00,0.01
+local blurriness_r = 0.0 --track@blurriness_r:Blurriness::R,0,8192,0,0.01,0.00,0.01
+local blurriness_g = 0.0 --track@blurriness_g:Blurriness::G,0,8192,0,0.01,0.00,0.01
+local blurriness_b = 0.0 --track@blurriness_b:Blurriness::B,0,8192,0,0.01,0.00,0.01
+local blurriness_a = 0.0 --track@blurriness_a:Blurriness::A,0,8192,0,0.01,0.00,0.01
+--group
 local dimensions = 0 --select@dimensions:Dimensions=2,Horizontal=0,Vertical=1,Horizontal and Vertical=2
 local should_resize = true --check@should_resize:Resize,true
 --[[pixelshader@horizontal:

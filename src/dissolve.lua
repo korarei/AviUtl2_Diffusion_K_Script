@@ -12,6 +12,7 @@ local mode = 0 --select@mode:Mode,Dissolve=0,Dancing Dissolve=1
 
 do
     local w, h = obj.w, obj.h
+
     if w * h < 1 then
         return
     end
