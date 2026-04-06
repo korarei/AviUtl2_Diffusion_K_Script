@@ -43,13 +43,19 @@
 #### パラメータ
 
 - Intensity: オートン効果の強さ
-- Bluriness: ぼかしの強さ
+- Blurriness: ぼかしの強さ
 - Low: マスクの閾値 (下)
 - High: マスクの閾値 (上)
 - Softness: マスクの柔らかさ
 - Invert: マスクの反転
+- Brightness: マスク処理後の輝度
+- Contrast: マスク処理後のコントラスト
 - Blend Mode: 合成モード (暗くするものと明るくするものを選択可能)
+- Alpha Mode: アルファモード (Alpha Blending, Alpha Hashed)
 - Clamp: 描画結果を0-1に飽和
+
+> [!NOTE]
+> `Contrast`は`-100.00`より小さい値に設定するとネガポジ反転する．
 
 ### GaussianBlur
 
@@ -57,7 +63,7 @@
 
 #### パラメータ
 
-- Bluriness: ぼかしの強さ
+- Blurriness: ぼかしの強さ
 - Dimensions: ぼかしの方向 (Horizontal, Vertical, Horizontal and Vertical)
 - Resize: ぼかした画像のサイズを調整 (フィルタオブジェクトでは無視)
 

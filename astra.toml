@@ -25,8 +25,8 @@ report-issue = "https://github.com/korarei/AviUtl2_Diffusion_K_Script/issues"
 summary = "オートン効果スクリプト"
 description = """
 以下の機能が追加される
-- Orton (光効果): オートン効果
-- GaussianBlur (ぼかし): ガウシアンぼかし
+- 光効果 -> Orton: オートン効果
+- ぼかし -> GaussianBlur: ガウシアンぼかし
 """
 
 [[release.contents.extensions]]
