@@ -18,6 +18,7 @@ sources = [
     { file = "${SOURCE}/dissolve.lua", LABEL = "加工" },
     { file = "${SOURCE}/scatter.lua", LABEL = "加工" },
     { file = "${SOURCE}/noise.lua", LABEL = "加工" },
+    { file = "${SOURCE}/noise_hsla.lua", LABEL = "加工" },
 ]
 
 [release]
@@ -31,8 +32,11 @@ description = """
 以下の機能が追加される
 - 光効果 -> Orton: オートン効果
 - ぼかし -> GaussianBlur: ガウシアンブラー
+- ぼかし -> ChannelBlur: チャンネル別ガウシアンブラー
 - 加工 -> Dissolve: ディザ合成
-- 加工 -> Scatter: 拡散
+- 加工 -> Scatter: ピクセル拡散
+- 加工 -> Noise: ノイズ
+- 加工 -> Noise(HSLA): HSLAノイズ
 """
 
 [[release.contents.extensions]]

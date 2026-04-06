@@ -4,7 +4,7 @@ cbuffer params : register(b0) {
     float amount;
     float color;
     float should_clamp;
-};
+}
 
 static const float eps = 1.0e-4;
 
@@ -53,12 +53,13 @@ noise(float4 pos : SV_Position) : SV_Target {
             src.rgb += r.rgb;
             break;
         case 2:
-            src += r;
+            src.rgb += r.rgb;
+            src.a = saturate(src.a + r.a);
             break;
         default:
             break;
     }
 
-    const float4 output = float4(src.rgb, src.a);
+    const float4 output = float4(src.rgb * src.a, src.a);
     return lerp(output, saturate(output), should_clamp);
 }

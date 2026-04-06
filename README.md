@@ -5,7 +5,7 @@
 ![GitHub Downloads](https://img.shields.io/github/downloads/korarei/AviUtl2_Diffusion_K_Script/total)
 ![GitHub Release](https://img.shields.io/github/v/release/korarei/AviUtl2_Diffusion_K_Script)
 
-画像に対してオートン効果をかけるスクリプト
+拡散系エフェクトスクリプト．
 
 [ダウンロードはこちらから](https://github.com/korarei/AviUtl2_Diffusion_K_Script/releases)
 
@@ -130,6 +130,39 @@
   - Horizontal: 水平方向
   - Vertical: 垂直方向
   - Both: 水平・垂直方向
+- Seed: シード値
+
+### Noise
+
+初期ラベル: `加工`
+
+ノイズエフェクト．
+
+#### パラメータ
+
+- Amount: ノイズの強さ
+- Color: ノイズの色
+  - BW: 白黒ノイズ
+  - RGB: RGBノイズ
+  - RGBA: RGBAノイズ
+- Seed: シード値
+- Clamp: 描画結果を0-1に飽和
+
+> [!NOTE]
+> `Color`を`RGBA`に設定した場合，`Clamp`有効無効にかかわらずアルファ値は0-1に飽和する．
+
+### Noise(HSLA)
+
+初期ラベル: `加工`
+
+HSLAノイズエフェクト．
+
+#### パラメータ
+
+- Amount::H: Hチャンネルのノイズの強さ
+- Amount::S: Sチャンネルのノイズの強さ
+- Amount::L: Lチャンネルのノイズの強さ
+- Amount::A: Aチャンネルのノイズの強さ
 - Seed: シード値
 
 ## ビルド方法
