@@ -76,25 +76,43 @@
 
 初期ラベル: `ぼかし`
 
-ガウシアンブラー．
+ガウシアンブラーエフェクト．
 
 #### パラメータ
 
 - Blurriness: ぼかしの強さ
-- Dimensions: ぼかしの方向 (Horizontal, Vertical, Horizontal and Vertical)
+- Dimensions: ぼかしの方向
+  - Horizontal: 水平方向
+  - Vertical: 垂直方向
+  - Horizontal and Vertical: 水平・垂直方向
 - Resize: ぼかした画像のサイズを調整 (フィルタオブジェクトでは無視)
 
 ### Dissolve
 
 初期ラベル: `加工`
 
-ディザ合成．
+ディザ合成エフェクト．
 
 #### パラメータ
 
 - Mode: ディザ合成の種類
   - Dissolve: ディザ合成
   - Dancing Dissolve: ダイナミックディザ合成
+
+### Scatter
+
+初期ラベル: `加工`
+
+画像のピクセルを拡散させるエフェクト．
+
+#### パラメータ
+
+- Amount: 拡散の強さ
+- Grain: 拡散の方向
+  - Horizontal: 水平方向
+  - Vertical: 垂直方向
+  - Both: 水平・垂直方向
+- Seed: シード値
 
 ## ビルド方法
 

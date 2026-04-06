@@ -1,7 +1,7 @@
 --@Orton
 
 --requires:${PROJECT_REQUIRES_AVIUTL2}
---information:Orton@${SCRIPT_NAME} v${SCRIPT_VERSION} by ${SCRIPT_AUTHOR}
+--information:Orton@${SCRIPT_NAME} v${PROJECT_VERSION} by ${PROJECT_AUTHOR}
 --label:${LABEL}
 --filter
 

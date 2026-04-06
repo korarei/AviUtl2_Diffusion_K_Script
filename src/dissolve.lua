@@ -1,7 +1,7 @@
 --@Dissolve
 
 --requires:${PROJECT_REQUIRES_AVIUTL2}
---information:Dissolve@${SCRIPT_NAME} v${SCRIPT_VERSION} by ${SCRIPT_AUTHOR}
+--information:Dissolve@${SCRIPT_NAME} v${PROJECT_VERSION} by ${PROJECT_AUTHOR}
 --label:${LABEL}
 --filter
 

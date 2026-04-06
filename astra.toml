@@ -15,6 +15,7 @@ sources = [
     { file = "${SOURCE}/blur.lua", LABEL = "ぼかし" },
     { file = "${SOURCE}/orton.lua", LABEL = "光効果" },
     { file = "${SOURCE}/dissolve.lua", LABEL = "加工" },
+    { file = "${SOURCE}/scatter.lua", LABEL = "加工" },
 ]
 
 [release]
@@ -29,6 +30,7 @@ description = """
 - 光効果 -> Orton: オートン効果
 - ぼかし -> GaussianBlur: ガウシアンブラー
 - 加工 -> Dissolve: ディザ合成
+- 加工 -> Scatter: 拡散
 """
 
 [[release.contents.extensions]]
