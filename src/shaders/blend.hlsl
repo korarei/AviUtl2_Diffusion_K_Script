@@ -4,7 +4,7 @@ Texture2D tex[2] : register(t0);
 cbuffer params : register(b0) {
     float intensity;
     float blend_mode;
-    float clamp_output;
+    float should_clamp;
 }
 
 static const float eps = 1.0e-4;
@@ -69,7 +69,7 @@ blend(float4 pos : SV_Position) : SV_Target {
     if (mode == 0) {
         src *= intensity;
         const float4 output = mad(1.0 - src.a, base, src);
-        return lerp(output, saturate(output), clamp_output);
+        return lerp(output, saturate(output), should_clamp);
     }
 
     src = float4(src.rgb * rcp(max(src.a, eps)), src.a * intensity);
@@ -121,5 +121,5 @@ blend(float4 pos : SV_Position) : SV_Target {
     const float a = mad(1.0 - base.a, src.a, base.a);
     const float4 output = float4(rgb, a);
 
-    return lerp(output, saturate(output), clamp_output);
+    return lerp(output, saturate(output), should_clamp);
 }

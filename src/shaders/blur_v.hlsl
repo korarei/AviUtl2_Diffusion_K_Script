@@ -1,7 +1,6 @@
 Texture2D tex : register(t0);
 SamplerState smp : register(s0);
 cbuffer params : register(b0) {
-    float texel;
     float sigma;
     float radius;
 }
@@ -21,6 +20,10 @@ gaussian(float x) {
 
 float4
 vertical(PS_Input input) : SV_Target {
+    float2 size;
+    tex.GetDimensions(size.x, size.y);
+
+    const float texel = rcp(size.y);
     const int r = int(radius);
 
     float4 color = tex.Sample(smp, input.uv);

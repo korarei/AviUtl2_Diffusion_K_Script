@@ -1,16 +1,17 @@
 RWTexture2D<half4> dst : register(u0);
 Texture2D src : register(t0);
 cbuffer params : register(b0) {
-    float2 offset;
+    float2 origin;
 }
 
+// Countは `(元画像サイズ + 15) / 16` で計算すること
 [numthreads(16, 16, 1)]
 void
-map(uint3 dtid : SV_DispatchThreadID) {
-    uint w, h;
-    src.GetDimensions(w, h);
-    if (dtid.x >= w || dtid.y >= h)
+map(uint3 pos : SV_DispatchThreadID) {
+    uint2 size;
+    src.GetDimensions(size.x, size.y);
+    if (any(pos.xy >= size))
         return;
 
-    dst[dtid.xy + uint2(offset)] = src[dtid.xy];
+    dst[pos.xy + uint2(origin)] = src[pos.xy];
 }

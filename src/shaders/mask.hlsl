@@ -2,7 +2,7 @@ Texture2D tex : register(t0);
 cbuffer params : register(b0) {
     float2 threshold;
     float softness;
-    float invert;
+    float should_invert;
 }
 
 static const float eps = 1.0e-4;
@@ -14,5 +14,5 @@ mask(float4 pos : SV_Position) : SV_Target {
     const float m0 = smoothstep(threshold.x - softness, threshold.x + softness, lum);
     const float m1 = smoothstep(threshold.y + softness, threshold.y - softness, lum);
     const float m = m0 * m1;
-    return src * lerp(m, 1.0 - m, invert);
+    return src * lerp(m, 1.0 - m, should_invert);
 }
