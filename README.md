@@ -87,6 +87,24 @@
   - Horizontal and Vertical: 水平・垂直方向
 - Resize: ぼかした画像のサイズを調整 (フィルタオブジェクトでは無視)
 
+### ChannelBlur
+
+初期ラベル: `ぼかし`
+
+チャンネルごとにガウシアンブラーを適用するエフェクト．
+
+#### パラメータ
+
+- Blurriness::R: Rチャンネルのぼかしの強さ
+- Blurriness::G: Gチャンネルのぼかしの強さ
+- Blurriness::B: Bチャンネルのぼかしの強さ
+- Blurriness::A: Aチャンネルのぼかしの強さ
+- Dimensions: ぼかしの方向
+  - Horizontal: 水平方向
+  - Vertical: 垂直方向
+  - Horizontal and Vertical: 水平・垂直方向
+- Resize: ぼかした画像のサイズを調整 (フィルタオブジェクトでは無視)
+
 ### Dissolve
 
 初期ラベル: `加工`
