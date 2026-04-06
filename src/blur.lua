@@ -19,9 +19,7 @@ local should_resize = true --check@should_resize:Resize,true
 ]]
 
 do
-    local ceil, floor = math.ceil, math.floor
-    local getinfo, copybuffer, clearbuffer = obj.getinfo, obj.copybuffer, obj.clearbuffer
-    local pixelshader, computeshader = obj.pixelshader, obj.computeshader
+    local pixelshader, clearbuffer = obj.pixelshader, obj.clearbuffer
     local w, h = obj.w, obj.h
 
     if w * h < 1 then
@@ -29,19 +27,21 @@ do
     end
 
     local sigma = blurriness / 3.0
-    local radius = ceil(blurriness)
+    local radius = math.ceil(blurriness)
     local params = { sigma, radius }
 
     if radius < 1 then
         return
     end
 
-    if not getinfo("filter") and should_resize and copybuffer("tempbuffer", "object") then
+    if not obj.getinfo("filter") and should_resize and obj.copybuffer("tempbuffer", "object") then
+        local floor = math.floor
+
         local x = dimensions ~= 1 and radius or 0
         local y = dimensions ~= 0 and radius or 0
 
         clearbuffer("object", w + 2 * x, h + 2 * y)
-        computeshader("map", "object", "tempbuffer", { x, y }, floor((w + 15) * 0.0625), floor((h + 15) * 0.0625))
+        obj.computeshader("map", "object", "tempbuffer", { x, y }, floor((w + 15) * 0.0625), floor((h + 15) * 0.0625))
     end
 
     if dimensions == 0 then

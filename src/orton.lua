@@ -27,7 +27,6 @@ local should_clamp = 0 --check@should_clamp:Clamp,0
 ]]
 
 do
-    local max, ceil = math.max, math.ceil
     local clearbuffer, pixelshader = obj.clearbuffer, obj.pixelshader
     local w, h = obj.w, obj.h
 
@@ -41,7 +40,7 @@ do
 
     low = low * 0.01
     high = high * 0.01
-    softness = max(softness * 0.005, 0.001)
+    softness = math.max(softness * 0.005, 0.001)
 
     brightness = brightness * 0.01
     contrast = contrast * 0.01
@@ -54,7 +53,7 @@ do
     pixelshader("mask", "cache:mask", "object", { low, high, softness, should_invert, brightness, contrast })
 
     local sigma = blurriness / 3.0
-    local radius = ceil(blurriness)
+    local radius = math.ceil(blurriness)
     local params = { sigma, radius }
 
     if radius > 0 then

@@ -21,9 +21,8 @@ local should_resize = true --check@should_resize:Resize,true
 ]]
 
 do
-    local ceil, floor, max = math.ceil, math.floor, math.max
-    local getinfo, copybuffer, clearbuffer = obj.getinfo, obj.copybuffer, obj.clearbuffer
-    local pixelshader, computeshader = obj.pixelshader, obj.computeshader
+    local ceil = math.ceil
+    local pixelshader, clearbuffer = obj.pixelshader, obj.clearbuffer
     local w, h = obj.w, obj.h
 
     if w * h < 1 then
@@ -44,13 +43,15 @@ do
         return
     end
 
-    if not getinfo("filter") and should_resize and copybuffer("tempbuffer", "object") then
-        local radius = max(radius_r, radius_g, radius_b, radius_a)
+    if not obj.getinfo("filter") and should_resize and obj.copybuffer("tempbuffer", "object") then
+        local floor = math.floor
+
+        local radius = math.max(radius_r, radius_g, radius_b, radius_a)
         local x = dimensions ~= 1 and radius or 0
         local y = dimensions ~= 0 and radius or 0
 
         clearbuffer("object", w + 2 * x, h + 2 * y)
-        computeshader(
+        obj.computeshader(
             "map@GaussianBlur@${SCRIPT_NAME}",
             "object",
             "tempbuffer",
