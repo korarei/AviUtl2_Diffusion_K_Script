@@ -12,8 +12,8 @@ suffix = ".anm2"
 variables = { SOURCE = "./src" }
 include_directories = ["${SOURCE}/shaders"]
 sources = [
-    { file = "${SOURCE}/blur.lua", LABEL = "ぼかし" },
-    { file = "${SOURCE}/blur_rgba.lua", LABEL = "ぼかし" },
+    { file = "${SOURCE}/gaussian_blur.lua", LABEL = "ぼかし" },
+    { file = "${SOURCE}/channel_blur.lua", LABEL = "ぼかし" },
     { file = "${SOURCE}/orton.lua", LABEL = "光効果" },
     { file = "${SOURCE}/dissolve.lua", LABEL = "加工" },
     { file = "${SOURCE}/scatter.lua", LABEL = "加工" },

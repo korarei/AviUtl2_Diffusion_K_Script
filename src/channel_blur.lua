@@ -14,10 +14,10 @@ local blurriness_a = 0.0 --track@blurriness_a:Blurriness::A,0,8192,0,0.01,0.00,0
 local dimensions = 0 --select@dimensions:Dimensions=2,Horizontal=0,Vertical=1,Horizontal and Vertical=2
 local should_resize = true --check@should_resize:Resize,true
 --[[pixelshader@horizontal:
---#include <blur_rgba_h.hlsl>
+--#include <channel_blur_h.hlsl>
 ]]
 --[[pixelshader@vertical:
---#include <blur_rgba_v.hlsl>
+--#include <channel_blur_v.hlsl>
 ]]
 
 do

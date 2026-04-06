@@ -12,10 +12,10 @@ local should_resize = true --check@should_resize:Resize,true
 --#include <map.hlsl>
 ]]
 --[[pixelshader@horizontal:
---#include <blur_h.hlsl>
+--#include <gaussian_blur_h.hlsl>
 ]]
 --[[pixelshader@vertical:
---#include <blur_v.hlsl>
+--#include <gaussian_blur_v.hlsl>
 ]]
 
 do
