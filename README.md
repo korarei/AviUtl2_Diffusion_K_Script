@@ -18,9 +18,9 @@
 
 ## 導入・更新・削除
 
-初期配置場所は`光効果`と`ぼかし`である．
+初期ラベルは`光効果`，`ぼかし`，`加工`である．
 
-`オブジェクト追加メニューの設定`から`ラベル`を変更することで任意の場所へ移動可能．
+`オブジェクト追加メニューの設定`からラベルを変更することで任意の場所に移動可能．
 
 ### 導入・更新
 
@@ -38,6 +38,8 @@
 
 ### Orton
 
+初期ラベル: `光効果`
+
 オートン効果の機能拡張版エフェクト．
 
 #### パラメータ
@@ -51,7 +53,20 @@
 - Brightness: マスク処理後の輝度
 - Contrast: マスク処理後のコントラスト
 - Blend Mode: 合成モード (暗くするものと明るくするものを選択可能)
-- Alpha Mode: アルファモード (Alpha Blending, Alpha Hashed)
+  - Normal: 通常合成
+  - Darken: 比較 (暗)
+  - Multiply: 乗算
+  - Color Burn: 焼き込み (カラー)
+  - Linear Burn: 焼き込み (リニア)
+  - Darker Color: カラー比較 (暗)
+  - Lighten: 比較 (明)
+  - Screen: スクリーン
+  - Color Dodge: 覆い焼き (カラー)
+  - Linear Dodge (Add): 覆い焼き (リニア) - 加算
+  - Lighter Color: カラー比較 (明)
+- Alpha Mode: アルファモード
+  - Alpha Blending: アルファブレンド
+  - Alpha Hashed: アルファハッシュ
 - Clamp: 描画結果を0-1に飽和
 
 > [!NOTE]
@@ -59,13 +74,27 @@
 
 ### GaussianBlur
 
-ガウシアンぼかし．
+初期ラベル: `ぼかし`
+
+ガウシアンブラー．
 
 #### パラメータ
 
 - Blurriness: ぼかしの強さ
 - Dimensions: ぼかしの方向 (Horizontal, Vertical, Horizontal and Vertical)
 - Resize: ぼかした画像のサイズを調整 (フィルタオブジェクトでは無視)
+
+### Dissolve
+
+初期ラベル: `加工`
+
+ディザ合成．
+
+#### パラメータ
+
+- Mode: ディザ合成の種類
+  - Dissolve: ディザ合成
+  - Dancing Dissolve: ダイナミックディザ合成
 
 ## ビルド方法
 
@@ -74,6 +103,8 @@
 ## ライセンス
 
 本プログラムのライセンスは[LICENSE](./LICENSE)を参照されたい．
+
+また，本プログラムが利用するサードパーティ製ライブラリ等のライセンス情報は[THIRD_PARTY_LICENSES](./THIRD_PARTY_LICENSES.md)に記載している．
 
 ## 更新履歴
 

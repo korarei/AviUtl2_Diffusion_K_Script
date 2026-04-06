@@ -6,6 +6,7 @@ cbuffer params : register(b0) {
     float blend_mode;
     float alpha_mode;
     float should_clamp;
+    float seed;
 }
 
 static const float eps = 1.0e-4;
@@ -43,7 +44,7 @@ hash(float4 i) {
 
 inline float4
 dissolve(float4 c, float2 p) {
-    return float4(c.rgb * rcp(max(c.a, eps)), 1.0) * step(hash(float4(p, 0.0, 0.0)) + eps, c.a);
+    return float4(c.rgb * rcp(max(c.a, eps)), 1.0) * step(hash(float4(p, seed, 0.0)) + eps, c.a);
 }
 
 inline float3

@@ -14,6 +14,7 @@ include_directories = ["${SOURCE}/shaders"]
 sources = [
     { file = "${SOURCE}/blur.lua", LABEL = "ぼかし" },
     { file = "${SOURCE}/orton.lua", LABEL = "光効果" },
+    { file = "${SOURCE}/dissolve.lua", LABEL = "加工" },
 ]
 
 [release]
@@ -26,7 +27,8 @@ summary = "オートン効果スクリプト"
 description = """
 以下の機能が追加される
 - 光効果 -> Orton: オートン効果
-- ぼかし -> GaussianBlur: ガウシアンぼかし
+- ぼかし -> GaussianBlur: ガウシアンブラー
+- 加工 -> Dissolve: ディザ合成
 """
 
 [[release.contents.extensions]]

@@ -63,5 +63,10 @@ do
         pixelshader("vertical@GaussianBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
     end
 
-    pixelshader("blend", "object", { "cache:mask", "object" }, { intensity, blend_mode, alpha_mode, should_clamp })
+    pixelshader(
+        "blend",
+        "object",
+        { "cache:mask", "object" },
+        { intensity, blend_mode, alpha_mode, should_clamp, w * h }
+    )
 end
