@@ -1,7 +1,6 @@
 Texture2D tex : register(t0);
 SamplerState smp : register(s0);
 cbuffer params : register(b0) {
-    float texel;
     float sigma;
     float radius;
 }
@@ -21,17 +20,23 @@ gaussian(float x) {
 
 float4
 vertical(PS_Input input) : SV_Target {
-    const int r = int(radius);
+    float2 size;
+    tex.GetDimensions(size.x, size.y);
+
+    const float texel = rcp(size.y);
+    const int count = int(radius);
 
     float4 color = tex.Sample(smp, input.uv);
     float weight = 1.0;
 
-    for (int i = 1; i <= r; i += 2) {
-        float w0 = gaussian(float(i));
-        float w1 = gaussian(float(i + 1));
-        float w = w0 + w1;
+    for (int i = 1; i <= count; i += 2) {
+        const float x = float(i);
 
-        float2 offset = float2(0.0, mad(w1, rcp(w), float(i)) * texel);
+        const float w0 = gaussian(x);
+        const float w1 = gaussian(x + 1.0);
+        const float w = w0 + w1;
+
+        const float2 offset = float2(0.0, mad(w1, rcp(w), x) * texel);
         color += (tex.Sample(smp, input.uv + offset) + tex.Sample(smp, input.uv - offset)) * w;
         weight += w * 2.0;
     }

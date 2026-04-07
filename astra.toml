@@ -12,8 +12,13 @@ suffix = ".anm2"
 variables = { SOURCE = "./src" }
 include_directories = ["${SOURCE}/shaders"]
 sources = [
-    { file = "${SOURCE}/blur.lua", LABEL = "ぼかし" },
+    { file = "${SOURCE}/gaussian_blur.lua", LABEL = "ぼかし" },
+    { file = "${SOURCE}/channel_blur.lua", LABEL = "ぼかし" },
     { file = "${SOURCE}/orton.lua", LABEL = "光効果" },
+    { file = "${SOURCE}/dissolve.lua", LABEL = "加工" },
+    { file = "${SOURCE}/scatter.lua", LABEL = "加工" },
+    { file = "${SOURCE}/noise.lua", LABEL = "加工" },
+    { file = "${SOURCE}/noise_hsla.lua", LABEL = "加工" },
 ]
 
 [release]
@@ -22,11 +27,16 @@ information = "${PROJECT_NAME} v${PROJECT_VERSION} by ${PROJECT_AUTHOR}"
 license = "MIT"
 website = "https://github.com/korarei/AviUtl2_Diffusion_K_Script"
 report-issue = "https://github.com/korarei/AviUtl2_Diffusion_K_Script/issues"
-summary = "オートン効果スクリプト"
+summary = "拡散系エフェクト"
 description = """
 以下の機能が追加される
-- Orton (光効果): オートン効果
-- GaussianBlur (ぼかし): ガウシアンぼかし
+- 光効果 -> Orton: オートン効果
+- ぼかし -> GaussianBlur: ガウシアンブラー
+- ぼかし -> ChannelBlur: チャンネル別ガウシアンブラー
+- 加工 -> Dissolve: ディザ合成
+- 加工 -> Scatter: ピクセル拡散
+- 加工 -> Noise: ノイズ
+- 加工 -> Noise(HSLA): HSLAノイズ
 """
 
 [[release.contents.extensions]]
