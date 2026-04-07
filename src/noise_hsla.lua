@@ -6,10 +6,10 @@
 --filter
 
 --group:Amount,true
-local amount_h = 0.0 --track@amount_h:Amount::H,0,1000,0,0.01
-local amount_s = 0.0 --track@amount_s:Amount::S,0,1000,0,0.01
-local amount_l = 0.0 --track@amount_l:Amount::L,0,1000,0,0.01
-local amount_a = 0.0 --track@amount_a:Amount::A,0,1000,0,0.01
+local amount_h = 0.0 --track@amount_h:Amount::Hue,0,1000,0,0.01
+local amount_s = 0.0 --track@amount_s:Amount::Saturation,0,1000,0,0.01
+local amount_l = 0.0 --track@amount_l:Amount::Lightness,0,1000,0,0.01
+local amount_a = 0.0 --track@amount_a:Amount::Alpha,0,1000,0,0.01
 --group
 local seed = 0 --track@seed:Seed,-1000,1000,-1,1
 --[[pixelshader@noise_hsla:

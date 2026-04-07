@@ -11,7 +11,7 @@
 
 ## 動作確認
 
-- [AviUtl ExEdit2 beta39](https://spring-fragrance.mints.ne.jp/aviutl/)
+- [AviUtl ExEdit2 beta40a](https://spring-fragrance.mints.ne.jp/aviutl/)
 
 > [!CAUTION]
 > beta38以降必須．
@@ -95,10 +95,10 @@
 
 #### パラメータ
 
-- Blurriness::R: Rチャンネルのぼかしの強さ
-- Blurriness::G: Gチャンネルのぼかしの強さ
-- Blurriness::B: Bチャンネルのぼかしの強さ
-- Blurriness::A: Aチャンネルのぼかしの強さ
+- Blurriness::Red: Rチャンネルのぼかしの強さ
+- Blurriness::Green: Gチャンネルのぼかしの強さ
+- Blurriness::Blue: Bチャンネルのぼかしの強さ
+- Blurriness::Alpha: Aチャンネルのぼかしの強さ
 - Dimensions: ぼかしの方向
   - Horizontal: 水平方向
   - Vertical: 垂直方向
@@ -160,10 +160,10 @@ HSLAノイズエフェクト．
 
 #### パラメータ
 
-- Amount::H: Hチャンネルのノイズの強さ
-- Amount::S: Sチャンネルのノイズの強さ
-- Amount::L: Lチャンネルのノイズの強さ
-- Amount::A: Aチャンネルのノイズの強さ
+- Amount::Hue: Hチャンネルのノイズの強さ
+- Amount::Saturation: Sチャンネルのノイズの強さ
+- Amount::Lightness: Lチャンネルのノイズの強さ
+- Amount::Alpha: Aチャンネルのノイズの強さ
 - Seed: シード値
 
 ## ビルド方法
