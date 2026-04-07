@@ -27,7 +27,7 @@ information = "${PROJECT_NAME} v${PROJECT_VERSION} by ${PROJECT_AUTHOR}"
 license = "MIT"
 website = "https://github.com/korarei/AviUtl2_Diffusion_K_Script"
 report-issue = "https://github.com/korarei/AviUtl2_Diffusion_K_Script/issues"
-summary = "オートン効果スクリプト"
+summary = "拡散系エフェクト"
 description = """
 以下の機能が追加される
 - 光効果 -> Orton: オートン効果
