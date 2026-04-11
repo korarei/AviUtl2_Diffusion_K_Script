@@ -1,3 +1,6 @@
+[astra]
+requires-astra = ">=0.5.0"
+
 [project]
 name = "Diffusion_K"
 version = "0.1.0"
