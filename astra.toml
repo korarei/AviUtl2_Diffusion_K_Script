@@ -1,8 +1,11 @@
+[astra]
+requires-astra = ">=0.5.0"
+
 [project]
 name = "Diffusion_K"
 version = "0.1.0"
 author = "Korarei"
-requires-aviutl2 = "2003800"
+requires-aviutl2 = "2004100"
 
 [build]
 [[build.scripts]]

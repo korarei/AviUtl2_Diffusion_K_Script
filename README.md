@@ -11,10 +11,10 @@
 
 ## 動作確認
 
-- [AviUtl ExEdit2 beta40a](https://spring-fragrance.mints.ne.jp/aviutl/)
+- [AviUtl ExEdit2 beta41](https://spring-fragrance.mints.ne.jp/aviutl/)
 
 > [!CAUTION]
-> beta38以降必須．
+> beta41以降必須．
 
 ## 導入・更新・削除
 
@@ -46,12 +46,34 @@
 
 - Intensity: オートン効果の強さ
 - Blurriness: ぼかしの強さ
+- Exposure: 露出
+- Invert: マスクの反転
 - Low: マスクの閾値 (下)
 - High: マスクの閾値 (上)
 - Softness: マスクの柔らかさ
-- Invert: マスクの反転
+- Mask::Source: マスクのソース
+  - Image: 画像
+  - Layer: レイヤー
+- Mask::Image: マスク画像
+- Mask::Layer: マスクレイヤー
 - Brightness: マスク処理後の輝度
 - Contrast: マスク処理後のコントラスト
+- Rotation: ぼかしの回転
+- Scale::X: ぼかしの拡大率X
+- Scale::Y: ぼかしの拡大率Y
+- Aberration::Channels: 色収差のチャンネル
+  - Red & Green: RチャンネルとGチャンネルの色収差
+  - Red & Blue: RチャンネルとBチャンネルの色収差
+  - Green & Blue: GチャンネルとBチャンネルの色収差
+- Aberration::Offset: 色収差のオフセット
+- LoCA::Enable: LoCAの有効化
+- LoCA::Red: Rチャンネルのぼかし拡大率
+- LoCA::Green: Gチャンネルのぼかし拡大率
+- LoCA::Blue: Bチャンネルのぼかし拡大率
+- LaCA::Enable: LaCAの有効化
+- LaCA::Red: Rチャンネルの拡大率
+- LaCA::Green: Gチャンネルの拡大率
+- LaCA::Blue: Bチャンネルの拡大率
 - Blend Mode: 合成モード (暗くするものと明るくするものを選択可能)
   - Normal: 通常合成
   - Darken: 比較 (暗)
@@ -67,7 +89,12 @@
 - Alpha Mode: アルファモード
   - Alpha Blending: アルファブレンド
   - Alpha Hashed: アルファハッシュ
+- Gamma: 入力画像のガンマ値
 - Clamp: 描画結果を0-1に飽和
+- Glow Only: 光成分のみ表示
+- Layer Reference: レイヤー参照
+  - Absolute: 絶対参照
+  - Relative: 相対参照
 
 > [!NOTE]
 > `Contrast`は`-100.00`より小さい値に設定するとネガポジ反転する．
