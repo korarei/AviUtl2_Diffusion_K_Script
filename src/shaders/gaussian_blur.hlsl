@@ -6,18 +6,14 @@ SamplerState smp : register(s0);
 cbuffer params : register(b0) {
     float sigma;
     float radius;
-    float2 axis;
+    float2 texel;
 }
 
 static const float eps = 1.0e-4;
 
 float4
 blur(PS_Input input) : SV_Target {
-    float2 size;
-    tex.GetDimensions(size.x, size.y);
-
     const int r = int(radius);
-    const float2 texel = rcp(size) * axis;
     const float f = rcp(-2.0 * sigma * sigma);
 
     float4 color = tex.Sample(smp, input.uv);

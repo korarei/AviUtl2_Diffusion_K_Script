@@ -51,6 +51,8 @@ do
     seed = seed < 0 and -seed or obj.layer + seed
 
     local sigma = amount * 0.05
+    local sigma_x = grain ~= 1 and sigma / w or 0.0
+    local sigma_y = grain ~= 0 and sigma / h or 0.0
 
     if not obj.getinfo("filter") and should_resize and obj.copybuffer("tempbuffer", "object") then
         local floor = math.floor
@@ -65,12 +67,5 @@ do
         obj.computeshader("map@GaussianBlur@${SCRIPT_NAME}", "object", "tempbuffer", { x, y }, cx, cy)
     end
 
-    obj.pixelshader(
-        "scatter",
-        "object",
-        "object",
-        { grain ~= 1 and 1 or 0, grain ~= 0 and 1 or 0, seed, w * h, sigma },
-        "copy",
-        "clip"
-    )
+    obj.pixelshader("scatter", "object", "object", { sigma_x, sigma_y, seed, w * h }, "copy", "clip")
 end

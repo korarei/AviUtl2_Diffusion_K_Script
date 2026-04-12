@@ -203,7 +203,7 @@ do
         local radius_b = ceil(sigma_b * 3.0)
 
         if radius_r + radius_g + radius_b + radius_x > 0 then
-            local params = { sigma_r, sigma_g, sigma_b, sigma_x, radius_r, radius_g, radius_b, radius_x, 1.0, 0.0 }
+            local params = { sigma_r, sigma_g, sigma_b, sigma_x, radius_r, radius_g, radius_b, radius_x, 1.0 / bw, 0.0 }
             pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
         elseif not copybuffer("tempbuffer", "cache:mask") then
             print("@error", "Failed to copy buffer")
@@ -218,7 +218,7 @@ do
         radius_b = ceil(sigma_b * 3.0)
 
         if radius_r + radius_g + radius_b + radius_y > 0 then
-            local params = { sigma_r, sigma_g, sigma_b, sigma_y, radius_r, radius_g, radius_b, radius_y, 0.0, 1.0 }
+            local params = { sigma_r, sigma_g, sigma_b, sigma_y, radius_r, radius_g, radius_b, radius_y, 0.0, 1.0 / bh }
             pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
         elseif not copybuffer("cache:mask", "tempbuffer") then
             print("@error", "Failed to copy buffer")
@@ -226,7 +226,7 @@ do
         end
     else
         if radius_x > 0 then
-            local params = { sigma_x, radius_x, 1.0, 0.0 }
+            local params = { sigma_x, radius_x, 1.0 / bw, 0.0 }
             pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
         elseif not copybuffer("tempbuffer", "cache:mask") then
             print("@error", "Failed to copy buffer")
@@ -234,7 +234,7 @@ do
         end
 
         if radius_y > 0 then
-            local params = { sigma_y, radius_y, 0.0, 1.0 }
+            local params = { sigma_y, radius_y, 0.0, 1.0 / bh }
             pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
         elseif not copybuffer("cache:mask", "tempbuffer") then
             print("@error", "Failed to copy buffer")

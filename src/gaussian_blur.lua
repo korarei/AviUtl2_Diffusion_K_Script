@@ -59,16 +59,16 @@ do
     end
 
     if dimensions == 0 then
-        move({ 1.0, 0.0 }, 1, 2, 3, params)
+        move({ 1.0 / w, 0.0 }, 1, 2, 3, params)
         pixelshader("blur", "object", "object", params, "copy", "clamp")
     elseif dimensions == 1 then
-        move({ 0.0, 1.0 }, 1, 2, 3, params)
+        move({ 0.0, 1.0 / h }, 1, 2, 3, params)
         pixelshader("blur", "object", "object", params, "copy", "clamp")
     else
         clearbuffer("tempbuffer", w, h)
-        move({ 1.0, 0.0 }, 1, 2, 3, params)
+        move({ 1.0 / w, 0.0 }, 1, 2, 3, params)
         pixelshader("blur", "tempbuffer", "object", params, "copy", "clamp")
-        move({ 0.0, 1.0 }, 1, 2, 3, params)
+        move({ 0.0, 1.0 / h }, 1, 2, 3, params)
         pixelshader("blur", "object", "tempbuffer", params, "copy", "clamp")
     end
 end
