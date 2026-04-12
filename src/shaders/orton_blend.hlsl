@@ -8,6 +8,7 @@ cbuffer params : register(b0) {
     float alpha_mode;
     float gamma;
     float should_clamp;
+    float should_isolate_glow;
     float seed;
 }
 
@@ -153,7 +154,8 @@ blend(float4 pos : SV_Position) : SV_Target {
     rgb *= rcp(max(a, eps));
     rgb = pow(rgb, rcp(gamma));
     rgb *= a;
-    const float4 output = float4(rgb, a);
+
+    const float4 output = float4(rgb, a) * (1.0 + (src.a - 1.0) * should_isolate_glow);
 
     return lerp(output, saturate(output), should_clamp);
 }

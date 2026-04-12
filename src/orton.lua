@@ -7,8 +7,9 @@
 
 local intensity = 100.0 --track@intensity:Intensity,0,100,100,0.01
 local blurriness = 0.0 --track@blurriness:Blurriness,0,8192,25,0.01,0.00,0.01
+local exposure = 0.0 --track@exposure:Exposure,-10,10,1,0.001
 --group:Mask,true
-local low = 25.0 --track@low:Low,-1000,1000,25,0.01,0.00,0.01
+local low = 30.0 --track@low:Low,-1000,1000,30,0.01,0.00,0.01
 local high = 100.0 --track@high:High,-1000,1000,100,0.01,0.00,0.01
 local softness = 25.0 --track@softness:Softness,0,100,25,0.01
 local should_invert = 0 --check@should_invert:Invert,0
@@ -39,8 +40,9 @@ local laca_b = 98.0 --track@laca_b:LaCA::Blue,0,1000,98,0.01
 --#define BLEND_MODE_LIGHTEN Lighten=6,Screen=7,Color Dodge=8,Linear Dodge (Add)=9,Lighter Color=10
 local blend_mode = 7 --select@blend_mode:Blend Mode=7,${BLEND_MODE_NORMAL},${BLEND_MODE_DARKEN},${BLEND_MODE_LIGHTEN}
 local alpha_mode = 0 --select@alpha_mode:Alpha Mode,Alpha Blending=0,Alpha Hashed=1
-local gamma = 2.2 --track@gamma:Gamma,0,10,2.2,0.01
+local gamma = 2.2 --track@gamma:Gamma,0,10,2.2,0.001
 local should_clamp = 0 --check@should_clamp:Clamp,0
+local should_isolate_glow = 0 --check@should_isolate_glow:Glow Only,0
 --group:Additional Options,false
 local _0 = {} --value@_0:PI,{}
 --[[pixelshader@mask:
@@ -73,6 +75,8 @@ do
                 intensity = v
             elseif k == "Blurriness" and type(v) == "number" then
                 blurriness = v
+            elseif k == "Exposure" and type(v) == "number" then
+                exposure = v
             elseif k == "Low" and type(v) == "number" then
                 low = v
             elseif k == "High" and type(v) == "number" then
@@ -153,6 +157,8 @@ do
                 gamma = v
             elseif k == "Clamp" and type(v) == "boolean" then
                 should_clamp = v and 1 or 0
+            elseif k == "Glow Only" and type(v) == "boolean" then
+                should_isolate_glow = v and 1 or 0
             end
         end
     end
@@ -192,7 +198,12 @@ do
     pixelshader("rotate", "tempbuffer", "object", { c, s, 0.0, 0.0, -s, c, bw, bh }, "copy", "clamp")
 
     clearbuffer("cache:mask", bw, bh)
-    pixelshader("mask", "cache:mask", "tempbuffer", { low, high, softness, should_invert, brightness, contrast, gamma })
+    pixelshader(
+        "mask",
+        "cache:mask",
+        "tempbuffer",
+        { low, high, softness, should_invert, exposure, brightness, contrast, gamma }
+    )
 
     if should_enable_loca then
         local sigma_r = sigma_x * loca_r
@@ -259,6 +270,6 @@ do
         "blend",
         "object",
         { "cache:mask", "object" },
-        { intensity, blend_mode, alpha_mode, gamma, should_clamp, w * h }
+        { intensity, blend_mode, alpha_mode, gamma, should_clamp, should_isolate_glow, w * h }
     )
 end

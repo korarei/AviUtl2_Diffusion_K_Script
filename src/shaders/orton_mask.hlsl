@@ -3,6 +3,7 @@ cbuffer params : register(b0) {
     float2 threshold;
     float softness;
     float should_invert;
+    float exposure;
     float brightness;
     float contrast;
     float gamma;
@@ -22,6 +23,7 @@ mask(float4 pos : SV_Position) : SV_Target {
     const float m = m0 * m1;
 
     src.rgb = max(mad(src.rgb, 1.0 + contrast, mad(contrast, -0.5, brightness)), 0.0);
+    src.rgb = ldexp(src.rgb, exposure);
 
     return float4(src.rgb * src.a, src.a) * lerp(m, 1.0 - m, should_invert);
 }
