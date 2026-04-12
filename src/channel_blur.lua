@@ -13,11 +13,8 @@ local blurriness_a = 0.0 --track@blurriness_a:Blurriness::Alpha,0,8192,0,0.01,0.
 --group
 local dimensions = 0 --select@dimensions:Dimensions=2,Horizontal=0,Vertical=1,Horizontal and Vertical=2
 local should_resize = true --check@should_resize:Resize,true
---[[pixelshader@horizontal:
---#include <channel_blur_h.hlsl>
-]]
---[[pixelshader@vertical:
---#include <channel_blur_v.hlsl>
+--[[pixelshader@blur:
+--#include <channel_blur.hlsl>
 ]]
 
 do
@@ -37,7 +34,7 @@ do
     local radius_g = ceil(blurriness_g)
     local radius_b = ceil(blurriness_b)
     local radius_a = ceil(blurriness_a)
-    local params = { sigma_r, sigma_g, sigma_b, sigma_a, radius_r, radius_g, radius_b, radius_a }
+    local params = { sigma_r, sigma_g, sigma_b, sigma_a, radius_r, radius_g, radius_b, radius_a, 0.0, 0.0 }
 
     if radius_r + radius_g + radius_b + radius_a < 1 then
         return
@@ -49,25 +46,24 @@ do
         local radius = math.max(radius_r, radius_g, radius_b, radius_a)
         local x = dimensions ~= 1 and radius or 0
         local y = dimensions ~= 0 and radius or 0
+        local cx, cy = floor((w + 15) * 0.0625), floor((h + 15) * 0.0625)
+        w, h = w + 2 * x, h + 2 * y
 
-        clearbuffer("object", w + 2 * x, h + 2 * y)
-        obj.computeshader(
-            "map@GaussianBlur@${SCRIPT_NAME}",
-            "object",
-            "tempbuffer",
-            { x, y },
-            floor((w + 15) * 0.0625),
-            floor((h + 15) * 0.0625)
-        )
+        clearbuffer("object", w, h)
+        obj.computeshader("map@GaussianBlur@${SCRIPT_NAME}", "object", "tempbuffer", { x, y }, cx, cy)
     end
 
     if dimensions == 0 then
-        pixelshader("horizontal", "object", "object", params, "copy", "clamp")
+        params[9] = 1.0
+        pixelshader("blur", "object", "object", params, "copy", "clamp")
     elseif dimensions == 1 then
-        pixelshader("vertical", "object", "object", params, "copy", "clamp")
+        params[10] = 1.0
+        pixelshader("blur", "object", "object", params, "copy", "clamp")
     else
-        clearbuffer("tempbuffer", obj.w, obj.h)
-        pixelshader("horizontal", "tempbuffer", "object", params, "copy", "clamp")
-        pixelshader("vertical", "object", "tempbuffer", params, "copy", "clamp")
+        clearbuffer("tempbuffer", w, h)
+        params[9] = 1.0
+        pixelshader("blur", "tempbuffer", "object", params, "copy", "clamp")
+        params[9], params[10] = 0.0, 1.0
+        pixelshader("blur", "object", "tempbuffer", params, "copy", "clamp")
     end
 end

@@ -1,5 +1,6 @@
-// Darken/Lighten groupだけ
+#include "hash.hlsli"
 
+// Darken/Lighten groupだけ
 Texture2D tex[2] : register(t0);
 cbuffer params : register(b0) {
     float intensity;
@@ -11,40 +12,9 @@ cbuffer params : register(b0) {
 
 static const float eps = 1.0e-4;
 
-/*
-The following function is a modified version of pcg4d function
-Original implementation by Mark Jarzynski & Marc Olano
-https://github.com/markjarzynski/PCG3D/blob/master/LICENSE
-*/
-
-uint4
-pcg4d(uint4 v) {
-    v = v * 1664525u + 1013904223u;
-
-    v.x += v.y * v.w;
-    v.y += v.z * v.x;
-    v.z += v.x * v.y;
-    v.w += v.y * v.z;
-
-    v = v ^ v >> 16u;
-
-    v.x += v.y * v.w;
-    v.y += v.z * v.x;
-    v.z += v.x * v.y;
-    v.w += v.y * v.z;
-
-    return v;
-}
-
-inline float
-hash(float4 i) {
-    const uint4 v = pcg4d(uint4(i));
-    return dot(v, 1u) / 4294967295.0;
-}
-
 inline float4
 dissolve(float4 c, float2 p) {
-    return float4(c.rgb * rcp(max(c.a, eps)), 1.0) * step(hash(float4(p, seed, 0.0)) + eps, c.a);
+    return float4(c.rgb * rcp(max(c.a, eps)), 1.0) * step(hash(p, float2(seed, 0.0)) + eps, c.a);
 }
 
 inline float3

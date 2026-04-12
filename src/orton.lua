@@ -16,14 +16,17 @@ local should_invert = 0 --check@should_invert:Invert,0
 local brightness = 0.0 --track@brightness:Brightness,-1000,1000,0,0.01
 local contrast = 0.0 --track@contrast:Contrast,-1000,1000,0,0.01
 --group:Compositing,false
-local blend_mode = 7 --select@blend_mode:Blend Mode=7,Normal=0,Darken=1,Multiply=2,Color Burn=3,Linear Burn=4,Darker Color=5,Lighten=6,Screen=7,Color Dodge=8,Linear Dodge (Add)=9,Lighter Color=10
+--#define BLEND_MODE_NORMAL Normal=0
+--#define BLEND_MODE_DARKEN Darken=1,Multiply=2,Color Burn=3,Linear Burn=4,Darker Color=5
+--#define BLEND_MODE_LIGHTEN Lighten=6,Screen=7,Color Dodge=8,Linear Dodge (Add)=9,Lighter Color=10
+local blend_mode = 7 --select@blend_mode:Blend Mode=7,${BLEND_MODE_NORMAL},${BLEND_MODE_DARKEN},${BLEND_MODE_LIGHTEN}
 local alpha_mode = 0 --select@alpha_mode:Alpha Mode,Alpha Blending=0,Alpha Hashed=1
 local should_clamp = 0 --check@should_clamp:Clamp,0
 --[[pixelshader@mask:
---#include <mask.hlsl>
+--#include <orton_mask.hlsl>
 ]]
 --[[pixelshader@blend:
---#include <blend.hlsl>
+--#include <orton_blend.hlsl>
 ]]
 
 do
@@ -54,12 +57,15 @@ do
 
     local sigma = blurriness / 3.0
     local radius = math.ceil(blurriness)
-    local params = { sigma, radius }
 
     if radius > 0 then
+        local params = { sigma, radius, 0.0, 0.0 }
+
         clearbuffer("tempbuffer", w, h)
-        pixelshader("horizontal@GaussianBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
-        pixelshader("vertical@GaussianBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
+        params[3] = 1.0
+        pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
+        params[3], params[4] = 0.0, 1.0
+        pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
     end
 
     pixelshader(

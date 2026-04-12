@@ -11,11 +11,8 @@ local should_resize = true --check@should_resize:Resize,true
 --[[computeshader@map:
 --#include <map.hlsl>
 ]]
---[[pixelshader@horizontal:
---#include <gaussian_blur_h.hlsl>
-]]
---[[pixelshader@vertical:
---#include <gaussian_blur_v.hlsl>
+--[[pixelshader@blur:
+--#include <gaussian_blur.hlsl>
 ]]
 
 do
@@ -28,7 +25,7 @@ do
 
     local sigma = blurriness / 3.0
     local radius = math.ceil(blurriness)
-    local params = { sigma, radius }
+    local params = { sigma, radius, 0.0, 0.0 }
 
     if radius < 1 then
         return
@@ -39,18 +36,24 @@ do
 
         local x = dimensions ~= 1 and radius or 0
         local y = dimensions ~= 0 and radius or 0
+        local cx, cy = floor((w + 15) * 0.0625), floor((h + 15) * 0.0625)
+        w, h = w + 2 * x, h + 2 * y
 
-        clearbuffer("object", w + 2 * x, h + 2 * y)
-        obj.computeshader("map", "object", "tempbuffer", { x, y }, floor((w + 15) * 0.0625), floor((h + 15) * 0.0625))
+        clearbuffer("object", w, h)
+        obj.computeshader("map", "object", "tempbuffer", { x, y }, cx, cy)
     end
 
     if dimensions == 0 then
-        pixelshader("horizontal", "object", "object", params, "copy", "clamp")
+        params[3] = 1.0
+        pixelshader("blur", "object", "object", params, "copy", "clamp")
     elseif dimensions == 1 then
-        pixelshader("vertical", "object", "object", params, "copy", "clamp")
+        params[4] = 1.0
+        pixelshader("blur", "object", "object", params, "copy", "clamp")
     else
-        clearbuffer("tempbuffer", obj.w, obj.h)
-        pixelshader("horizontal", "tempbuffer", "object", params, "copy", "clamp")
-        pixelshader("vertical", "object", "tempbuffer", params, "copy", "clamp")
+        clearbuffer("tempbuffer", w, h)
+        params[3] = 1.0
+        pixelshader("blur", "tempbuffer", "object", params, "copy", "clamp")
+        params[3], params[4] = 0.0, 1.0
+        pixelshader("blur", "object", "tempbuffer", params, "copy", "clamp")
     end
 end
