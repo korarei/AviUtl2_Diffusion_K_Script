@@ -6,6 +6,7 @@ cbuffer params : register(b0) {
     float intensity;
     float blend_mode;
     float alpha_mode;
+    float gamma;
     float should_clamp;
     float seed;
 }
@@ -71,21 +72,39 @@ float4
 blend(float4 pos : SV_Position) : SV_Target {
     const int mode = int(blend_mode);
 
-    float4 src = tex[0].Load(int3(pos.xy, 0));
-    float4 base = tex[1].Load(int3(pos.xy, 0));
+    float4 src = max(tex[0].Load(int3(pos.xy, 0)), 0.0);
 
     if (int(alpha_mode) == 1)
         src = dissolve(src, pos.xy);
 
+    if (mode == -1) {
+        src.rgb *= rcp(max(src.a, eps));
+        src.rgb = pow(src.rgb, rcp(gamma));
+        src.rgb *= src.a;
+        return lerp(src, saturate(src), should_clamp);
+    }
+
+    float4 base = max(tex[1].Load(int3(pos.xy, 0)), 0.0);
+
     if (mode == 0) {
+        base.rgb *= rcp(max(base.a, eps));
+        base.rgb = pow(base.rgb, gamma);
+        base.rgb *= base.a;
+
         src *= intensity;
-        const float4 output = mad(1.0 - src.a, base, src);
+        float4 output = max(mad(1.0 - src.a, base, src), 0.0);
+
+        output.rgb *= rcp(max(output.a, eps));
+        output.rgb = pow(output.rgb, rcp(gamma));
+        output.rgb *= output.a;
+
         return lerp(output, saturate(output), should_clamp);
     }
 
     src.rgb *= rcp(max(src.a, eps));
-    src.a *= intensity;
     base.rgb *= rcp(max(base.a, eps));
+    src.a *= intensity;
+    base.rgb = pow(base.rgb, gamma);
 
     float3 blended;
     [forcecase]
@@ -129,8 +148,11 @@ blend(float4 pos : SV_Position) : SV_Target {
     src.rgb *= src.a;
     base.rgb *= base.a;
 
-    const float3 rgb = mad(1.0 - src.a, base.rgb, mad(1.0 - base.a, src.rgb, blended));
-    const float a = mad(1.0 - base.a, src.a, base.a);
+    float3 rgb = max(mad(1.0 - src.a, base.rgb, mad(1.0 - base.a, src.rgb, blended)), 0.0);
+    float a = mad(1.0 - base.a, src.a, base.a);
+    rgb *= rcp(max(a, eps));
+    rgb = pow(rgb, rcp(gamma));
+    rgb *= a;
     const float4 output = float4(rgb, a);
 
     return lerp(output, saturate(output), should_clamp);

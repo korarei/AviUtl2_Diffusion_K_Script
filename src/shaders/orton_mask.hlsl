@@ -5,14 +5,16 @@ cbuffer params : register(b0) {
     float should_invert;
     float brightness;
     float contrast;
+    float gamma;
 }
 
 static const float eps = 1.0e-4;
 
 float4
 mask(float4 pos : SV_Position) : SV_Target {
-    float4 src = tex.Load(int3(pos.xy, 0));
+    float4 src = max(tex.Load(int3(pos.xy, 0)), 0.0);
     src.rgb *= rcp(max(src.a, eps));
+    src.rgb = pow(src.rgb, gamma);
 
     const float lum = dot(src.rgb, float3(0.3, 0.59, 0.11));
     const float m0 = smoothstep(threshold.x - softness, threshold.x + softness, lum);

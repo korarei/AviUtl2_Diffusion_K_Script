@@ -18,6 +18,8 @@ local _0 = {} --value@_0:PI,{}
 do
     local w, h = obj.w, obj.h
 
+    local eps = 1.0e-4
+
     if w * h < 1 then
         return
     end
@@ -40,6 +42,10 @@ do
                 seed = v
             end
         end
+    end
+
+    if amount < eps then
+        return
     end
 
     seed = seed < 0 and -seed or obj.layer + seed

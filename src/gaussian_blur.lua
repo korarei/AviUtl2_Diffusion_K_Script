@@ -18,6 +18,7 @@ local _0 = {} --value@_0:PI,{}
 ]]
 
 do
+    local move = table.move
     local pixelshader, clearbuffer = obj.pixelshader, obj.clearbuffer
     local w, h = obj.w, obj.h
 
@@ -39,7 +40,7 @@ do
 
     local sigma = blurriness / 3.0
     local radius = math.ceil(blurriness)
-    local params = { sigma, radius, 0.0, 0.0 }
+    local params = { sigma, radius }
 
     if radius < 1 then
         return
@@ -58,16 +59,16 @@ do
     end
 
     if dimensions == 0 then
-        params[3] = 1.0
+        move({ 1.0, 0.0 }, 1, 2, 3, params)
         pixelshader("blur", "object", "object", params, "copy", "clamp")
     elseif dimensions == 1 then
-        params[4] = 1.0
+        move({ 0.0, 1.0 }, 1, 2, 3, params)
         pixelshader("blur", "object", "object", params, "copy", "clamp")
     else
         clearbuffer("tempbuffer", w, h)
-        params[3] = 1.0
+        move({ 1.0, 0.0 }, 1, 2, 3, params)
         pixelshader("blur", "tempbuffer", "object", params, "copy", "clamp")
-        params[3], params[4] = 0.0, 1.0
+        move({ 0.0, 1.0 }, 1, 2, 3, params)
         pixelshader("blur", "object", "tempbuffer", params, "copy", "clamp")
     end
 end
