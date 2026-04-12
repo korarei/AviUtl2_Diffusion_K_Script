@@ -9,11 +9,16 @@ local intensity = 100.0 --track@intensity:Intensity,0,100,100,0.01
 local blurriness = 0.0 --track@blurriness:Blurriness,0,8192,25,0.01,0.00,0.01
 local exposure = 0.0 --track@exposure:Exposure,-10,10,1,0.001
 --group:Mask,true
+local should_invert = 0 --check@should_invert:Invert,0
+--separator:Luminance Mask
 local low = 30.0 --track@low:Low,-1000,1000,30,0.01,0.00,0.01
 local high = 100.0 --track@high:High,-1000,1000,100,0.01,0.00,0.01
 local softness = 25.0 --track@softness:Softness,0,100,25,0.01
-local should_invert = 0 --check@should_invert:Invert,0
---group:Brightness & Contrast,true
+--separator:Texture Mask
+local mask_source = 0 --select@mask_source:Mask::Source,Image=0,Layer=1
+local mask_image = "" --file@mask_image:Mask::Image,
+local mask_layer = 0 --track@mask_layer:Mask::Layer,-100,100,0,1
+--group:Brightness & Contrast,false
 local brightness = 0.0 --track@brightness:Brightness,-1000,1000,0,0.01
 local contrast = 0.0 --track@contrast:Contrast,-1000,1000,0,0.01
 --group:Transform,false
@@ -22,8 +27,8 @@ local rotation = 0.0 --track@rotation:Rotation,-3600,3600,0,0.01
 local scale_x = 100.0 --track@scale_x:Scale::X,0,1000,100,0.01
 local scale_y = 100.0 --track@scale_y:Scale::Y,0,1000,100,0.01
 --group:Chromatic Aberration,false
-local channels = 0 --select@channels:Channels,Red & Green=-1,Red & Blue=0,Green & Blue=1
-local offset = 0.0 --track@offset:Offset,-1000,1000,0,0.01
+local channels = 0 --select@channels:Aberration::Channels,Red & Green=-1,Red & Blue=0,Green & Blue=1
+local offset = 0.0 --track@offset:Aberration::Offset,-1000,1000,0,0.01
 --separator:LoCA
 local should_enable_loca = false --check@should_enable_loca:LoCA::Enable,false
 local loca_r = 120.0 --track@loca_r:LoCA::Red,0,1000,120,0.01
@@ -44,6 +49,7 @@ local gamma = 2.2 --track@gamma:Gamma,0,10,2.2,0.001
 local should_clamp = 0 --check@should_clamp:Clamp,0
 local should_isolate_glow = 0 --check@should_isolate_glow:Glow Only,0
 --group:Additional Options,false
+local layer_reference = 0 --select@layer_reference:Layer Reference,Absolute=0,Relative=1
 local _0 = {} --value@_0:PI,{}
 --[[pixelshader@mask:
 --#include <orton_mask.hlsl>
@@ -59,13 +65,13 @@ local _0 = {} --value@_0:PI,{}
 ]]
 
 do
-    local ceil, abs, cos, sin, rad = math.ceil, math.abs, math.cos, math.sin, math.rad
+    local max, ceil, abs, cos, sin, rad = math.max, math.ceil, math.abs, math.cos, math.sin, math.rad
     local copybuffer, clearbuffer, pixelshader = obj.copybuffer, obj.clearbuffer, obj.pixelshader
-    local w, h = obj.w, obj.h
+    local W, H, LAYER = obj.w, obj.h, obj.layer
 
     local eps = 1.0e-4
 
-    if w * h < 1 then
+    if W * H < 1 then
         return
     end
 
@@ -77,14 +83,24 @@ do
                 blurriness = v
             elseif k == "Exposure" and type(v) == "number" then
                 exposure = v
+            elseif k == "Invert" and type(v) == "boolean" then
+                should_invert = v and 1 or 0
             elseif k == "Low" and type(v) == "number" then
                 low = v
             elseif k == "High" and type(v) == "number" then
                 high = v
             elseif k == "Softness" and type(v) == "number" then
                 softness = v
-            elseif k == "Invert" and type(v) == "boolean" then
-                should_invert = v and 1 or 0
+            elseif k == "Mask::Source" and type(v) == "string" then
+                if v == "Image" then
+                    mask_source = 0
+                elseif v == "Layer" then
+                    mask_source = 1
+                end
+            elseif k == "Mask::Image" and type(v) == "string" then
+                mask_image = v
+            elseif k == "Mask::Layer" and type(v) == "number" then
+                mask_layer = v
             elseif k == "Brightness" and type(v) == "number" then
                 brightness = v
             elseif k == "Contrast" and type(v) == "number" then
@@ -95,7 +111,7 @@ do
                 scale_x = v
             elseif k == "Scale::Y" and type(v) == "number" then
                 scale_y = v
-            elseif k == "Channels" and type(v) == "string" then
+            elseif k == "Aberration::Channels" and type(v) == "string" then
                 if v == "Red & Green" then
                     channels = -1
                 elseif v == "Red & Blue" then
@@ -103,7 +119,7 @@ do
                 elseif v == "Green & Blue" then
                     channels = 1
                 end
-            elseif k == "Offset" and type(v) == "number" then
+            elseif k == "Aberration::Offset" and type(v) == "number" then
                 offset = v
             elseif k == "LoCA::Enable" and type(v) == "boolean" then
                 should_enable_loca = v
@@ -159,6 +175,12 @@ do
                 should_clamp = v and 1 or 0
             elseif k == "Glow Only" and type(v) == "boolean" then
                 should_isolate_glow = v and 1 or 0
+            elseif k == "Layer Reference" and type(v) == "string" then
+                if v == "Absolute" then
+                    layer_reference = 0
+                elseif v == "Relative" then
+                    layer_reference = 1
+                end
             end
         end
     end
@@ -167,11 +189,31 @@ do
         return
     end
 
+    local copyxform
+
+    do
+        copyxform = function(dst, src)
+            dst.ox, dst.oy, dst.oz = src.ox, src.oy, src.oz
+            dst.cx, dst.cy, dst.cz = src.cx, src.cy, src.cz
+            dst.rx, dst.ry, dst.rz = src.rx, src.ry, src.rz
+            dst.sx, dst.sy, dst.sz = src.sx, src.sy, src.sz
+            dst.alpha = src.alpha
+        end
+    end
+
     intensity = intensity * 0.01
 
     low = low * 0.01
     high = high * 0.01
-    softness = math.max(softness * 0.005, 0.001)
+    softness = max(softness * 0.005, 0.001)
+    mask_layer = max(layer_reference == 0 and mask_layer or mask_layer + LAYER, 0)
+    local xform = {}
+    local should_load_mask
+    if mask_source == 0 then
+        should_load_mask = mask_image ~= ""
+    else
+        should_load_mask = mask_layer > 0 and mask_layer ~= LAYER
+    end
 
     brightness = brightness * 0.01
     contrast = contrast * 0.01
@@ -193,17 +235,47 @@ do
 
     local c, s = cos(rotation), sin(rotation)
     local abs_c, abs_s = abs(c), abs(s)
-    local bw, bh = ceil(w * abs_c + h * abs_s), ceil(w * abs_s + h * abs_c)
+    local bw, bh = ceil(W * abs_c + H * abs_s), ceil(W * abs_s + H * abs_c)
     clearbuffer("tempbuffer", bw, bh)
     pixelshader("rotate", "tempbuffer", "object", { c, s, 0.0, 0.0, -s, c, bw, bh }, "copy", "clamp")
 
+    if should_load_mask then
+        copyxform(xform, obj)
+        clearbuffer("cache:img", W, H)
+        if not copybuffer("cache:img", "object") then
+            print("@error", "Failed to copy buffer")
+            return
+        end
+
+        if mask_source == 0 and not obj.load("image", mask_image) then
+            print("@error", "Failed to load mask image")
+            return
+        elseif not obj.load("layer", mask_layer, true) then
+            print("@error", "Failed to load mask layer")
+            return
+        end
+    end
+
     clearbuffer("cache:mask", bw, bh)
-    pixelshader(
-        "mask",
-        "cache:mask",
-        "tempbuffer",
-        { low, high, softness, should_invert, exposure, brightness, contrast, gamma }
-    )
+    pixelshader("mask", "cache:mask", { "tempbuffer", "object" }, {
+        low,
+        high,
+        softness,
+        should_invert,
+        should_load_mask and 1 or 0,
+        exposure,
+        brightness,
+        contrast,
+        gamma,
+    }, "copy", "clip")
+
+    if should_load_mask then
+        copyxform(obj, xform)
+        if not copybuffer("object", "cache:img") then
+            print("@error", "Failed to copy buffer")
+            return
+        end
+    end
 
     if should_enable_loca then
         local sigma_r = sigma_x * loca_r
@@ -253,15 +325,15 @@ do
         end
     end
 
-    clearbuffer("tempbuffer", w, h)
-    pixelshader("rotate", "tempbuffer", "cache:mask", { c, -s, 0.0, 0.0, s, c, w, h }, "copy", "clamp")
+    clearbuffer("tempbuffer", W, H)
+    pixelshader("rotate", "tempbuffer", "cache:mask", { c, -s, 0.0, 0.0, s, c, W, H }, "copy", "clamp")
 
-    clearbuffer("cache:mask", w, h)
+    clearbuffer("cache:mask", W, H)
     pixelshader(
         "shift",
         "cache:mask",
         "tempbuffer",
-        { laca_r, laca_g, laca_b, should_enable_laca, offset * c / w, offset * s / h, channels },
+        { laca_r, laca_g, laca_b, should_enable_laca, offset * c / W, offset * s / H, channels },
         "copy",
         "clamp"
     )
@@ -270,6 +342,6 @@ do
         "blend",
         "object",
         { "cache:mask", "object" },
-        { intensity, blend_mode, alpha_mode, gamma, should_clamp, should_isolate_glow, w * h }
+        { intensity, blend_mode, alpha_mode, gamma, should_clamp, should_isolate_glow, W * H }
     )
 end

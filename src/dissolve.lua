@@ -13,9 +13,9 @@ local _0 = {} --value@_0:PI,{}
 ]]
 
 do
-    local w, h = obj.w, obj.h
+    local W, H = obj.w, obj.h
 
-    if w * h < 1 then
+    if W * H < 1 then
         return
     end
 
@@ -31,5 +31,5 @@ do
         end
     end
 
-    obj.pixelshader("dissolve", "object", "object", { w * h, mode == 1 and obj.time * obj.framerate * 100.0 or 0.0 })
+    obj.pixelshader("dissolve", "object", "object", { W * H, mode == 1 and obj.time * obj.framerate * 100.0 or 0.0 })
 end

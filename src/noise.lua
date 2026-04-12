@@ -16,11 +16,11 @@ local _0 = {} --value@_0:PI,{}
 ]]
 
 do
-    local w, h = obj.w, obj.h
+    local W, H = obj.w, obj.h
 
     local eps = 1.0e-4
 
-    if w * h < 1 then
+    if W * H < 1 then
         return
     end
 
@@ -51,5 +51,5 @@ do
     amount = amount * 0.01
     seed = seed < 0 and -seed or obj.layer + seed
 
-    obj.pixelshader("noise", "object", "object", { seed, w * h, amount, color, should_clamp })
+    obj.pixelshader("noise", "object", "object", { seed, W * H, amount, color, should_clamp })
 end

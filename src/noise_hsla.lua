@@ -18,9 +18,9 @@ local _0 = {} --value@_0:PI,{}
 ]]
 
 do
-    local w, h = obj.w, obj.h
+    local W, H = obj.w, obj.h
 
-    if w * h < 1 then
+    if W * H < 1 then
         return
     end
 
@@ -46,5 +46,5 @@ do
     amount_a = amount_a * 0.01
     seed = seed < 0 and -seed or obj.layer + seed
 
-    obj.pixelshader("noise_hsla", "object", "object", { amount_h, amount_s, amount_l, amount_a, seed, w * h })
+    obj.pixelshader("noise_hsla", "object", "object", { amount_h, amount_s, amount_l, amount_a, seed, W * H })
 end
