@@ -8,8 +8,8 @@
 local intensity = 100.0 --track@intensity:Intensity,0,100,100,0.01
 local blurriness = 0.0 --track@blurriness:Blurriness,0,8192,25,0.01,0.00,0.01
 --group:Mask,true
-local low = 50.0 --track@low:Low,-1000,1000,50,0.01,0.00,0.05
-local high = 100.0 --track@high:High,-1000,1000,100,0.01,0.00,0.05
+local low = 50.0 --track@low:Low,-1000,1000,50,0.01,0.00,0.01
+local high = 100.0 --track@high:High,-1000,1000,100,0.01,0.00,0.01
 local softness = 25.0 --track@softness:Softness,0,100,25,0.01
 local should_invert = 0 --check@should_invert:Invert,0
 --group:Brightness & Contrast,false
@@ -22,6 +22,8 @@ local contrast = 0.0 --track@contrast:Contrast,-1000,1000,0,0.01
 local blend_mode = 7 --select@blend_mode:Blend Mode=7,${BLEND_MODE_NORMAL},${BLEND_MODE_DARKEN},${BLEND_MODE_LIGHTEN}
 local alpha_mode = 0 --select@alpha_mode:Alpha Mode,Alpha Blending=0,Alpha Hashed=1
 local should_clamp = 0 --check@should_clamp:Clamp,0
+--group:Additional Options,false
+local _0 = {} --value@_0:PI,{}
 --[[pixelshader@mask:
 --#include <orton_mask.hlsl>
 ]]
@@ -37,6 +39,60 @@ do
 
     if w * h < 1 then
         return
+    end
+
+    if next(_0) then
+        for k, v in pairs(_0) do
+            if k == "Intensity" and type(v) == "number" then
+                intensity = v
+            elseif k == "Blurriness" and type(v) == "number" then
+                blurriness = v
+            elseif k == "Low" and type(v) == "number" then
+                low = v
+            elseif k == "High" and type(v) == "number" then
+                high = v
+            elseif k == "Softness" and type(v) == "number" then
+                softness = v
+            elseif k == "Invert" and type(v) == "boolean" then
+                should_invert = v and 1 or 0
+            elseif k == "Brightness" and type(v) == "number" then
+                brightness = v
+            elseif k == "Contrast" and type(v) == "number" then
+                contrast = v
+            elseif k == "Blend Mode" and type(v) == "string" then
+                if v == "Normal" then
+                    blend_mode = 0
+                elseif v == "Darken" then
+                    blend_mode = 1
+                elseif v == "Multiply" then
+                    blend_mode = 2
+                elseif v == "Color Burn" then
+                    blend_mode = 3
+                elseif v == "Linear Burn" then
+                    blend_mode = 4
+                elseif v == "Darker Color" then
+                    blend_mode = 5
+                elseif v == "Lighten" then
+                    blend_mode = 6
+                elseif v == "Screen" then
+                    blend_mode = 7
+                elseif v == "Color Dodge" then
+                    blend_mode = 8
+                elseif v == "Linear Dodge (Add)" then
+                    blend_mode = 9
+                elseif v == "Lighter Color" then
+                    blend_mode = 10
+                end
+            elseif k == "Alpha Mode" and type(v) == "string" then
+                if v == "Alpha Blending" then
+                    alpha_mode = 0
+                elseif v == "Alpha Hashed" then
+                    alpha_mode = 1
+                end
+            elseif k == "Clamp" and type(v) == "boolean" then
+                should_clamp = v and 1 or 0
+            end
+        end
     end
 
     intensity = intensity * 0.01

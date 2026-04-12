@@ -4,7 +4,7 @@
 Texture2D tex : register(t0);
 SamplerState smp : register(s0);
 cbuffer params : register(b0) {
-    float2 weight;
+    float2 axis;
     float2 seed;
     float sigma;
 }
@@ -24,6 +24,7 @@ scatter(PS_Input input) : SV_Target {
     float2 size;
     tex.GetDimensions(size.x, size.y);
 
-    const float2 offset = box_muller(input.pos.xy) * rcp(size);
-    return tex.Sample(smp, mad(weight, offset, input.uv));
+    const float2 texel = rcp(size) * axis;
+    const float2 offset = box_muller(input.pos.xy) * texel;
+    return tex.Sample(smp, input.uv + offset);
 }

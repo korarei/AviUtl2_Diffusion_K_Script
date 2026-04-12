@@ -11,8 +11,11 @@ local blurriness_g = 0.0 --track@blurriness_g:Blurriness::Green,0,8192,0,0.01,0.
 local blurriness_b = 0.0 --track@blurriness_b:Blurriness::Blue,0,8192,0,0.01,0.00,0.01
 local blurriness_a = 0.0 --track@blurriness_a:Blurriness::Alpha,0,8192,0,0.01,0.00,0.01
 --group
+--separator
 local dimensions = 0 --select@dimensions:Dimensions=2,Horizontal=0,Vertical=1,Horizontal and Vertical=2
 local should_resize = true --check@should_resize:Resize,true
+--group:Additional Options,false
+local _0 = {} --value@_0:PI,{}
 --[[pixelshader@blur:
 --#include <channel_blur.hlsl>
 ]]
@@ -24,6 +27,24 @@ do
 
     if w * h < 1 then
         return
+    end
+
+    if next(_0) then
+        for k, v in pairs(_0) do
+            if k == "Blurriness::Red" and type(v) == "number" then
+                blurriness_r = v
+            elseif k == "Blurriness::Green" and type(v) == "number" then
+                blurriness_g = v
+            elseif k == "Blurriness::Blue" and type(v) == "number" then
+                blurriness_b = v
+            elseif k == "Blurriness::Alpha" and type(v) == "number" then
+                blurriness_a = v
+            elseif k == "Dimensions" and type(v) == "number" then
+                dimensions = v
+            elseif k == "Resize" and type(v) == "boolean" then
+                should_resize = v
+            end
+        end
     end
 
     local sigma_r = blurriness_r / 3.0
