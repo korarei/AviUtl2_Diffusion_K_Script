@@ -9,15 +9,17 @@ local intensity = 100.0 --track@intensity:Intensity,0,100,100,0.01
 local blurriness = 0.0 --track@blurriness:Blurriness,0,8192,25,0.01,0.00,0.01
 local exposure = 0.0 --track@exposure:Exposure,-10,10,1,0.001
 --group:Mask,true
-local should_invert = 0 --check@should_invert:Invert,0
 --separator:Luminance Mask
 local low = 30.0 --track@low:Low,0,1000,30,0.01,0.00,0.01
 local high = 100.0 --track@high:High,0,1000,100,0.01,0.00,0.01
 local softness = 25.0 --track@softness:Softness,0,100,25,0.01
 --separator:Texture Mask
 local mask_source = 0 --select@mask_source:Mask::Source,Image=0,Layer=1
+local mask_channel = 0 --select@mask_channel:Mask::Channel,Luminance=0,Alpha=1
 local mask_image = "" --file@mask_image:Mask::Image,
 local mask_layer = 0 --track@mask_layer:Mask::Layer,-100,100,0,1
+--separator:Mask Options
+local should_invert = 0 --check@should_invert:Invert,0
 --group:Brightness & Contrast,false
 local brightness = 0.0 --track@brightness:Brightness,-1000,1000,0,0.01
 local contrast = 0.0 --track@contrast:Contrast,-1000,1000,0,0.01
@@ -83,8 +85,6 @@ do
                 blurriness = v
             elseif k == "Exposure" and type(v) == "number" then
                 exposure = v
-            elseif k == "Invert" and type(v) == "boolean" then
-                should_invert = v and 1 or 0
             elseif k == "Low" and type(v) == "number" then
                 low = v
             elseif k == "High" and type(v) == "number" then
@@ -97,10 +97,18 @@ do
                 elseif v == "Layer" then
                     mask_source = 1
                 end
+            elseif k == "Mask::Channel" and type(v) == "string" then
+                if v == "Luminance" then
+                    mask_channel = 0
+                elseif v == "Alpha" then
+                    mask_channel = 1
+                end
             elseif k == "Mask::Image" and type(v) == "string" then
                 mask_image = v
             elseif k == "Mask::Layer" and type(v) == "number" then
                 mask_layer = v
+            elseif k == "Invert" and type(v) == "boolean" then
+                should_invert = v and 1 or 0
             elseif k == "Brightness" and type(v) == "number" then
                 brightness = v
             elseif k == "Contrast" and type(v) == "number" then
@@ -248,11 +256,19 @@ do
         end
 
         if mask_source == 0 and not obj.load("image", mask_image) then
-            print("@error", "Failed to load mask image")
-            return
+            should_load_mask = false
+            print("@warn", "Failed to load mask image")
+            if not copybuffer("object", "cache:img") then
+                print("@error", "Failed to copy buffer")
+                return
+            end
         elseif not obj.load("layer", mask_layer, true) then
-            print("@error", "Failed to load mask layer")
-            return
+            should_load_mask = false
+            print("@warn", "Failed to load mask layer")
+            if not copybuffer("object", "cache:img") then
+                print("@error", "Failed to copy buffer")
+                return
+            end
         end
     end
 
@@ -261,6 +277,7 @@ do
         low,
         high,
         softness,
+        mask_channel,
         should_invert,
         should_load_mask and 1 or 0,
         exposure,
