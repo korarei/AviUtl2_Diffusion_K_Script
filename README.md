@@ -54,6 +54,9 @@
 - Mask::Source: マスクのソース
   - Image: 画像
   - Layer: レイヤー
+- Mask::Channel: マスクチャンネル
+  - Luminance: 輝度
+  - Alpha: アルファ
 - Mask::Image: マスク画像
 - Mask::Layer: マスクレイヤー
 - Brightness: マスク処理後の輝度
@@ -75,6 +78,7 @@
 - LaCA::Green: Gチャンネルの拡大率
 - LaCA::Blue: Bチャンネルの拡大率
 - Blend Mode: 合成モード (暗くするものと明るくするものを選択可能)
+  - Replace: 置換
   - Normal: 通常合成
   - Darken: 比較 (暗)
   - Multiply: 乗算
@@ -89,15 +93,19 @@
 - Alpha Mode: アルファモード
   - Alpha Blending: アルファブレンド
   - Alpha Hashed: アルファハッシュ
-- Gamma: 入力画像のガンマ値
 - Clamp: 描画結果を0-1に飽和
 - Glow Only: 光成分のみ表示
+- Gamma: 入力画像のガンマ値
 - Layer Reference: レイヤー参照
   - Absolute: 絶対参照
   - Relative: 相対参照
 
 > [!NOTE]
-> `Contrast`は`-100.00`より小さい値に設定するとネガポジ反転する．
+> - `Contrast`は`-100.00`より小さい値に設定するとネガポジ反転する．
+> - `LoCA::Enable`を有効にするとストレートアルファの都合上，やや暗くなる．
+> - `Gamma`は既にリニアな画像に対して適用する場合は`1.0`に設定する．
+> - マスク画像はガンマ補正などはされない．
+> - 輝度はAEの輝度計算式 (Luminosity) で採用されている (0.3, 0.59, 0.11) を使用している．
 
 ### GaussianBlur
 
@@ -192,6 +200,18 @@ HSLAノイズエフェクト．
 - Amount::Lightness: Lチャンネルのノイズの強さ
 - Amount::Alpha: Aチャンネルのノイズの強さ
 - Seed: シード値
+
+### 共通項目
+
+- PI: パラメータインジェクション
+
+パラメータ値を上書きする．以下のようにエイリアス名と値で記述する．
+
+```lua
+{ ["Amount::Hue"] = 10.0 }
+```
+
+`{}`は既に入力済みである．
 
 ## ビルド方法
 
