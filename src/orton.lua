@@ -290,12 +290,14 @@ do
         local sigma_r = sigma_x * loca_r
         local sigma_g = sigma_x * loca_g
         local sigma_b = sigma_x * loca_b
+        local sigma_a = max(sigma_r, sigma_g, sigma_b)
         local radius_r = ceil(sigma_r * 3.0)
         local radius_g = ceil(sigma_g * 3.0)
         local radius_b = ceil(sigma_b * 3.0)
+        local radius_a = ceil(sigma_a * 3.0)
 
-        if radius_r + radius_g + radius_b + radius_x > 0 then
-            local params = { sigma_r, sigma_g, sigma_b, sigma_x, radius_r, radius_g, radius_b, radius_x, 1.0 / bw, 0.0 }
+        if radius_r + radius_g + radius_b + radius_a > 0 then
+            local params = { sigma_r, sigma_g, sigma_b, sigma_a, radius_r, radius_g, radius_b, radius_a, 1.0 / bw, 0.0 }
             pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
         elseif not copybuffer("cache:mask", "tempbuffer") then
             print("@error", "Failed to copy buffer")
@@ -305,12 +307,14 @@ do
         sigma_r = sigma_y * loca_r
         sigma_g = sigma_y * loca_g
         sigma_b = sigma_y * loca_b
+        sigma_a = max(sigma_r, sigma_g, sigma_b)
         radius_r = ceil(sigma_r * 3.0)
         radius_g = ceil(sigma_g * 3.0)
         radius_b = ceil(sigma_b * 3.0)
+        radius_a = ceil(sigma_a * 3.0)
 
-        if radius_r + radius_g + radius_b + radius_y > 0 then
-            local params = { sigma_r, sigma_g, sigma_b, sigma_y, radius_r, radius_g, radius_b, radius_y, 0.0, 1.0 / bh }
+        if radius_r + radius_g + radius_b + radius_a > 0 then
+            local params = { sigma_r, sigma_g, sigma_b, sigma_a, radius_r, radius_g, radius_b, radius_a, 0.0, 1.0 / bh }
             pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
         elseif not copybuffer("tempbuffer", "cache:mask") then
             print("@error", "Failed to copy buffer")
