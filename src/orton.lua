@@ -11,8 +11,8 @@ local exposure = 0.0 --track@exposure:Exposure,-10,10,1,0.001
 --group:Mask,true
 local should_invert = 0 --check@should_invert:Invert,0
 --separator:Luminance Mask
-local low = 30.0 --track@low:Low,-1000,1000,30,0.01,0.00,0.01
-local high = 100.0 --track@high:High,-1000,1000,100,0.01,0.00,0.01
+local low = 30.0 --track@low:Low,0,1000,30,0.01,0.00,0.01
+local high = 100.0 --track@high:High,0,1000,100,0.01,0.00,0.01
 local softness = 25.0 --track@softness:Softness,0,100,25,0.01
 --separator:Texture Mask
 local mask_source = 0 --select@mask_source:Mask::Source,Image=0,Layer=1
@@ -21,7 +21,7 @@ local mask_layer = 0 --track@mask_layer:Mask::Layer,-100,100,0,1
 --group:Brightness & Contrast,false
 local brightness = 0.0 --track@brightness:Brightness,-1000,1000,0,0.01
 local contrast = 0.0 --track@contrast:Contrast,-1000,1000,0,0.01
---group:Transform,false
+--group:Anisotropy,false
 local rotation = 0.0 --track@rotation:Rotation,-3600,3600,0,0.01
 --separator:Scale
 local scale_x = 100.0 --track@scale_x:Scale::X,0,1000,100,0.01
