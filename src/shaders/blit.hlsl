@@ -7,7 +7,7 @@ cbuffer params : register(b0) {
 // Countは `(元画像サイズ + 15) / 16` で計算すること
 [numthreads(16, 16, 1)]
 void
-map(uint3 pos : SV_DispatchThreadID) {
+blit(uint3 pos : SV_DispatchThreadID) {
     uint2 size;
     src.GetDimensions(size.x, size.y);
     if (any(pos.xy >= size))

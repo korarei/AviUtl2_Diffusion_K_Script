@@ -71,7 +71,7 @@ do
         w, h = w + 2 * x, h + 2 * y
 
         clearbuffer("object", w, h)
-        obj.computeshader("map@GaussianBlur@${SCRIPT_NAME}", "object", "tempbuffer", { x, y }, cx, cy)
+        obj.computeshader("blit@GaussianBlur@${SCRIPT_NAME}", "object", "tempbuffer", { x, y }, cx, cy)
     end
 
     if dimensions == 0 then
