@@ -45,10 +45,10 @@ local laca_b = 98.0 --track@laca_b:LaCA::Blue,0,1000,98,0.01
 --#define BLEND_MODE_LIGHTEN Lighten=6,Screen=7,Color Dodge=8,Linear Dodge (Add)=9,Lighter Color=10
 local blend_mode = 7 --select@blend_mode:Blend Mode=7,${BLEND_MODE_NORMAL},${BLEND_MODE_DARKEN},${BLEND_MODE_LIGHTEN}
 local alpha_mode = 0 --select@alpha_mode:Alpha Mode,Alpha Blending=0,Alpha Hashed=1
-local gamma = 2.2 --track@gamma:Gamma,0,10,2.2,0.001
 local should_clamp = 0 --check@should_clamp:Clamp,0
 local should_isolate_glow = 0 --check@should_isolate_glow:Glow Only,0
 --group:Additional Options,false
+local gamma = 2.2 --track@gamma:Gamma,0,10,2.2,0.001
 local layer_reference = 0 --select@layer_reference:Layer Reference,Absolute=0,Relative=1
 local _0 = {} --value@_0:PI,{}
 --[[pixelshader@mask:
@@ -169,12 +169,12 @@ do
                 elseif v == "Alpha Hashed" then
                     alpha_mode = 1
                 end
-            elseif k == "Gamma" and type(v) == "number" then
-                gamma = v
             elseif k == "Clamp" and type(v) == "boolean" then
                 should_clamp = v and 1 or 0
             elseif k == "Glow Only" and type(v) == "boolean" then
                 should_isolate_glow = v and 1 or 0
+            elseif k == "Gamma" and type(v) == "number" then
+                gamma = v
             elseif k == "Layer Reference" and type(v) == "string" then
                 if v == "Absolute" then
                     layer_reference = 0
