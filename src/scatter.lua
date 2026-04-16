@@ -64,7 +64,7 @@ do
         w, h = w + 2 * x, h + 2 * y
 
         obj.clearbuffer("object", w, h)
-        obj.computeshader("map@GaussianBlur@${SCRIPT_NAME}", "object", "tempbuffer", { x, y }, cx, cy)
+        obj.computeshader("blit@GaussianBlur@${SCRIPT_NAME}", "object", "tempbuffer", { x, y }, cx, cy)
     end
 
     obj.pixelshader("scatter", "object", "object", { sigma_x, sigma_y, seed, w * h }, "copy", "clip")

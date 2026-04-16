@@ -10,8 +10,8 @@ local dimensions = 0 --select@dimensions:Dimensions=2,Horizontal=0,Vertical=1,Ho
 local should_resize = true --check@should_resize:Resize,true
 --group:Additional Options,false
 local _0 = {} --value@_0:PI,{}
---[[computeshader@map:
---#include <map.hlsl>
+--[[computeshader@blit:
+--#include <blit.hlsl>
 ]]
 --[[pixelshader@blur:
 --#include <gaussian_blur.hlsl>
@@ -55,7 +55,7 @@ do
         w, h = w + 2 * x, h + 2 * y
 
         clearbuffer("object", w, h)
-        obj.computeshader("map", "object", "tempbuffer", { x, y }, cx, cy)
+        obj.computeshader("blit", "object", "tempbuffer", { x, y }, cx, cy)
     end
 
     if dimensions == 0 then

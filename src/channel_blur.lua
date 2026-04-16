@@ -11,7 +11,6 @@ local blurriness_g = 0.0 --track@blurriness_g:Blurriness::Green,0,8192,0,0.01,0.
 local blurriness_b = 0.0 --track@blurriness_b:Blurriness::Blue,0,8192,0,0.01,0.00,0.01
 local blurriness_a = 0.0 --track@blurriness_a:Blurriness::Alpha,0,8192,0,0.01,0.00,0.01
 --group
---separator
 local dimensions = 0 --select@dimensions:Dimensions=2,Horizontal=0,Vertical=1,Horizontal and Vertical=2
 local should_resize = true --check@should_resize:Resize,true
 --group:Additional Options,false
@@ -71,7 +70,7 @@ do
         w, h = w + 2 * x, h + 2 * y
 
         clearbuffer("object", w, h)
-        obj.computeshader("map@GaussianBlur@${SCRIPT_NAME}", "object", "tempbuffer", { x, y }, cx, cy)
+        obj.computeshader("blit@GaussianBlur@${SCRIPT_NAME}", "object", "tempbuffer", { x, y }, cx, cy)
     end
 
     if dimensions == 0 then

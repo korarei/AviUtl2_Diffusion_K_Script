@@ -73,7 +73,7 @@ float4
 blend(float4 pos : SV_Position) : SV_Target {
     const int mode = int(blend_mode);
 
-    float4 src = max(tex[0].Load(int3(pos.xy, 0)), 0.0);
+    float4 src = max(tex[0].Load(int3(pos.xy, 0)), 0.0); // Linear
 
     if (int(alpha_mode) == 1)
         src = dissolve(src, pos.xy);
@@ -85,7 +85,7 @@ blend(float4 pos : SV_Position) : SV_Target {
         return lerp(src, saturate(src), should_clamp);
     }
 
-    float4 base = max(tex[1].Load(int3(pos.xy, 0)), 0.0);
+    float4 base = max(tex[1].Load(int3(pos.xy, 0)), 0.0); // Non-Linear
 
     if (mode == 0) {
         base.rgb *= rcp(max(base.a, eps));

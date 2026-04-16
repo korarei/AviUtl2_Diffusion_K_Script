@@ -9,19 +9,21 @@ local intensity = 100.0 --track@intensity:Intensity,0,100,100,0.01
 local blurriness = 0.0 --track@blurriness:Blurriness,0,8192,25,0.01,0.00,0.01
 local exposure = 0.0 --track@exposure:Exposure,-10,10,1,0.001
 --group:Mask,true
-local should_invert = 0 --check@should_invert:Invert,0
 --separator:Luminance Mask
-local low = 30.0 --track@low:Low,-1000,1000,30,0.01,0.00,0.01
-local high = 100.0 --track@high:High,-1000,1000,100,0.01,0.00,0.01
+local low = 30.0 --track@low:Low,0,1000,30,0.01,0.00,0.01
+local high = 100.0 --track@high:High,0,1000,100,0.01,0.00,0.01
 local softness = 25.0 --track@softness:Softness,0,100,25,0.01
 --separator:Texture Mask
 local mask_source = 0 --select@mask_source:Mask::Source,Image=0,Layer=1
+local mask_channel = 0 --select@mask_channel:Mask::Channel,Luminance=0,Alpha=1
 local mask_image = "" --file@mask_image:Mask::Image,
 local mask_layer = 0 --track@mask_layer:Mask::Layer,-100,100,0,1
+--separator:Mask Options
+local should_invert = 0 --check@should_invert:Invert,0
 --group:Brightness & Contrast,false
 local brightness = 0.0 --track@brightness:Brightness,-1000,1000,0,0.01
 local contrast = 0.0 --track@contrast:Contrast,-1000,1000,0,0.01
---group:Transform,false
+--group:Anisotropy,false
 local rotation = 0.0 --track@rotation:Rotation,-3600,3600,0,0.01
 --separator:Scale
 local scale_x = 100.0 --track@scale_x:Scale::X,0,1000,100,0.01
@@ -45,10 +47,10 @@ local laca_b = 98.0 --track@laca_b:LaCA::Blue,0,1000,98,0.01
 --#define BLEND_MODE_LIGHTEN Lighten=6,Screen=7,Color Dodge=8,Linear Dodge (Add)=9,Lighter Color=10
 local blend_mode = 7 --select@blend_mode:Blend Mode=7,${BLEND_MODE_NORMAL},${BLEND_MODE_DARKEN},${BLEND_MODE_LIGHTEN}
 local alpha_mode = 0 --select@alpha_mode:Alpha Mode,Alpha Blending=0,Alpha Hashed=1
-local gamma = 2.2 --track@gamma:Gamma,0,10,2.2,0.001
 local should_clamp = 0 --check@should_clamp:Clamp,0
 local should_isolate_glow = 0 --check@should_isolate_glow:Glow Only,0
 --group:Additional Options,false
+local gamma = 2.2 --track@gamma:Gamma,0,10,2.2,0.001
 local layer_reference = 0 --select@layer_reference:Layer Reference,Absolute=0,Relative=1
 local _0 = {} --value@_0:PI,{}
 --[[pixelshader@mask:
@@ -83,8 +85,6 @@ do
                 blurriness = v
             elseif k == "Exposure" and type(v) == "number" then
                 exposure = v
-            elseif k == "Invert" and type(v) == "boolean" then
-                should_invert = v and 1 or 0
             elseif k == "Low" and type(v) == "number" then
                 low = v
             elseif k == "High" and type(v) == "number" then
@@ -97,10 +97,18 @@ do
                 elseif v == "Layer" then
                     mask_source = 1
                 end
+            elseif k == "Mask::Channel" and type(v) == "string" then
+                if v == "Luminance" then
+                    mask_channel = 0
+                elseif v == "Alpha" then
+                    mask_channel = 1
+                end
             elseif k == "Mask::Image" and type(v) == "string" then
                 mask_image = v
             elseif k == "Mask::Layer" and type(v) == "number" then
                 mask_layer = v
+            elseif k == "Invert" and type(v) == "boolean" then
+                should_invert = v and 1 or 0
             elseif k == "Brightness" and type(v) == "number" then
                 brightness = v
             elseif k == "Contrast" and type(v) == "number" then
@@ -169,12 +177,12 @@ do
                 elseif v == "Alpha Hashed" then
                     alpha_mode = 1
                 end
-            elseif k == "Gamma" and type(v) == "number" then
-                gamma = v
             elseif k == "Clamp" and type(v) == "boolean" then
                 should_clamp = v and 1 or 0
             elseif k == "Glow Only" and type(v) == "boolean" then
                 should_isolate_glow = v and 1 or 0
+            elseif k == "Gamma" and type(v) == "number" then
+                gamma = v
             elseif k == "Layer Reference" and type(v) == "string" then
                 if v == "Absolute" then
                     layer_reference = 0
@@ -248,11 +256,19 @@ do
         end
 
         if mask_source == 0 and not obj.load("image", mask_image) then
-            print("@error", "Failed to load mask image")
-            return
+            should_load_mask = false
+            print("@warn", "Failed to load mask image")
+            if not copybuffer("object", "cache:img") then
+                print("@error", "Failed to copy buffer")
+                return
+            end
         elseif not obj.load("layer", mask_layer, true) then
-            print("@error", "Failed to load mask layer")
-            return
+            should_load_mask = false
+            print("@warn", "Failed to load mask layer")
+            if not copybuffer("object", "cache:img") then
+                print("@error", "Failed to copy buffer")
+                return
+            end
         end
     end
 
@@ -261,6 +277,7 @@ do
         low,
         high,
         softness,
+        mask_channel,
         should_invert,
         should_load_mask and 1 or 0,
         exposure,
@@ -277,18 +294,29 @@ do
         end
     end
 
+    pixelshader(
+        "shift",
+        "tempbuffer",
+        "cache:mask",
+        { laca_r, laca_g, laca_b, should_enable_laca, offset * c / W, offset * s / H, channels },
+        "copy",
+        "clamp"
+    )
+
     if should_enable_loca then
         local sigma_r = sigma_x * loca_r
         local sigma_g = sigma_x * loca_g
         local sigma_b = sigma_x * loca_b
+        local sigma_a = max(sigma_r, sigma_g, sigma_b)
         local radius_r = ceil(sigma_r * 3.0)
         local radius_g = ceil(sigma_g * 3.0)
         local radius_b = ceil(sigma_b * 3.0)
+        local radius_a = ceil(sigma_a * 3.0)
 
-        if radius_r + radius_g + radius_b + radius_x > 0 then
-            local params = { sigma_r, sigma_g, sigma_b, sigma_x, radius_r, radius_g, radius_b, radius_x, 1.0 / bw, 0.0 }
-            pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
-        elseif not copybuffer("tempbuffer", "cache:mask") then
+        if radius_r + radius_g + radius_b + radius_a > 0 then
+            local params = { sigma_r, sigma_g, sigma_b, sigma_a, radius_r, radius_g, radius_b, radius_a, 1.0 / bw, 0.0 }
+            pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
+        elseif not copybuffer("cache:mask", "tempbuffer") then
             print("@error", "Failed to copy buffer")
             return
         end
@@ -296,47 +324,39 @@ do
         sigma_r = sigma_y * loca_r
         sigma_g = sigma_y * loca_g
         sigma_b = sigma_y * loca_b
+        sigma_a = max(sigma_r, sigma_g, sigma_b)
         radius_r = ceil(sigma_r * 3.0)
         radius_g = ceil(sigma_g * 3.0)
         radius_b = ceil(sigma_b * 3.0)
+        radius_a = ceil(sigma_a * 3.0)
 
-        if radius_r + radius_g + radius_b + radius_y > 0 then
-            local params = { sigma_r, sigma_g, sigma_b, sigma_y, radius_r, radius_g, radius_b, radius_y, 0.0, 1.0 / bh }
-            pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
-        elseif not copybuffer("cache:mask", "tempbuffer") then
+        if radius_r + radius_g + radius_b + radius_a > 0 then
+            local params = { sigma_r, sigma_g, sigma_b, sigma_a, radius_r, radius_g, radius_b, radius_a, 0.0, 1.0 / bh }
+            pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
+        elseif not copybuffer("tempbuffer", "cache:mask") then
             print("@error", "Failed to copy buffer")
             return
         end
     else
         if radius_x > 0 then
             local params = { sigma_x, radius_x, 1.0 / bw, 0.0 }
-            pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
-        elseif not copybuffer("tempbuffer", "cache:mask") then
+            pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
+        elseif not copybuffer("cache:mask", "tempbuffer") then
             print("@error", "Failed to copy buffer")
             return
         end
 
         if radius_y > 0 then
             local params = { sigma_y, radius_y, 0.0, 1.0 / bh }
-            pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
-        elseif not copybuffer("cache:mask", "tempbuffer") then
+            pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
+        elseif not copybuffer("tempbuffer", "cache:mask") then
             print("@error", "Failed to copy buffer")
             return
         end
     end
 
-    clearbuffer("tempbuffer", W, H)
-    pixelshader("rotate", "tempbuffer", "cache:mask", { c, -s, 0.0, 0.0, s, c, W, H }, "copy", "clamp")
-
     clearbuffer("cache:mask", W, H)
-    pixelshader(
-        "shift",
-        "cache:mask",
-        "tempbuffer",
-        { laca_r, laca_g, laca_b, should_enable_laca, offset * c / W, offset * s / H, channels },
-        "copy",
-        "clamp"
-    )
+    pixelshader("rotate", "cache:mask", "tempbuffer", { c, -s, 0.0, 0.0, s, c, W, H }, "copy", "clamp")
 
     pixelshader(
         "blend",
