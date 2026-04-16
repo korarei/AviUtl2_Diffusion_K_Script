@@ -298,7 +298,7 @@ do
         "shift",
         "tempbuffer",
         "cache:mask",
-        { laca_r, laca_g, laca_b, should_enable_laca, offset * c / W, offset * s / H, channels },
+        { laca_r, laca_g, laca_b, should_enable_laca, offset / bw, channels },
         "copy",
         "clamp"
     )
