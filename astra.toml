@@ -9,15 +9,15 @@ requires-aviutl2 = "2004100"
 
 [build]
 [[build.scripts]]
-id = "effect"
+id = "diffusion"
 prefix = "@"
 suffix = ".anm2"
 variables = { SOURCE = "./src" }
 include_directories = ["${SOURCE}/shaders"]
 sources = [
+    { file = "${SOURCE}/orton.lua", LABEL = "光効果" },
     { file = "${SOURCE}/gaussian_blur.lua", LABEL = "ぼかし" },
     { file = "${SOURCE}/channel_blur.lua", LABEL = "ぼかし" },
-    { file = "${SOURCE}/orton.lua", LABEL = "光効果" },
     { file = "${SOURCE}/dissolve.lua", LABEL = "加工" },
     { file = "${SOURCE}/scatter.lua", LABEL = "加工" },
     { file = "${SOURCE}/noise.lua", LABEL = "加工" },
@@ -44,7 +44,7 @@ description = """
 
 [[release.contents.extensions]]
 directory = "Script/${PROJECT_NAME}"
-files = ["script:effect"]
+files = ["script:diffusion"]
 
 [[release.contents.documents]]
 directory = "Script/${PROJECT_NAME}"

@@ -15,10 +15,11 @@ float4
 blur(PS_Input input) : SV_Target {
     const float4 f = rcp(-2.0 * sigma * sigma);
 
-    float4 color = tex.Sample(smp, input.uv);
     float4 weight = 1.0;
+    float4 color = tex.Sample(smp, input.uv);
+    color.rgb *= rcp(max(color.a, eps));
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 3; ++i) {
         const int r = int(radius[i]);
         for (int j = 1; j <= r; j += 2) {
             const float x = float(j);
@@ -28,10 +29,27 @@ blur(PS_Input input) : SV_Target {
             const float w = w0 + w1;
 
             const float2 offset = mad(w1, rcp(max(w, eps)), x) * texel;
-            color[i] += (tex.Sample(smp, input.uv + offset)[i] + tex.Sample(smp, input.uv - offset)[i]) * w;
+            const float4 c0 = tex.Sample(smp, input.uv + offset);
+            const float4 c1 = tex.Sample(smp, input.uv - offset);
+            color[i] += (c0[i] * rcp(max(c0.a, eps)) + c1[i] * rcp(max(c1.a, eps))) * w;
             weight[i] += w * 2.0;
         }
     }
 
-    return color * rcp(weight);
+    const int r = int(radius.a);
+    for (int k = 1; k <= r; k += 2) {
+        const float x = float(k);
+
+        const float w0 = gaussian(x, f.a);
+        const float w1 = gaussian(x + 1.0, f.a);
+        const float w = w0 + w1;
+
+        const float2 offset = mad(w1, rcp(max(w, eps)), x) * texel;
+        color.a += (tex.Sample(smp, input.uv + offset).a + tex.Sample(smp, input.uv - offset).a) * w;
+        weight.a += w * 2.0;
+    }
+
+    color *= rcp(weight);
+
+    return float4(color.rgb * color.a, color.a);
 }

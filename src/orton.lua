@@ -277,6 +277,15 @@ do
         end
     end
 
+    pixelshader(
+        "shift",
+        "tempbuffer",
+        "cache:mask",
+        { laca_r, laca_g, laca_b, should_enable_laca, offset * c / W, offset * s / H, channels },
+        "copy",
+        "clamp"
+    )
+
     if should_enable_loca then
         local sigma_r = sigma_x * loca_r
         local sigma_g = sigma_x * loca_g
@@ -287,8 +296,8 @@ do
 
         if radius_r + radius_g + radius_b + radius_x > 0 then
             local params = { sigma_r, sigma_g, sigma_b, sigma_x, radius_r, radius_g, radius_b, radius_x, 1.0 / bw, 0.0 }
-            pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
-        elseif not copybuffer("tempbuffer", "cache:mask") then
+            pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
+        elseif not copybuffer("cache:mask", "tempbuffer") then
             print("@error", "Failed to copy buffer")
             return
         end
@@ -302,41 +311,31 @@ do
 
         if radius_r + radius_g + radius_b + radius_y > 0 then
             local params = { sigma_r, sigma_g, sigma_b, sigma_y, radius_r, radius_g, radius_b, radius_y, 0.0, 1.0 / bh }
-            pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
-        elseif not copybuffer("cache:mask", "tempbuffer") then
+            pixelshader("blur@ChannelBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
+        elseif not copybuffer("tempbuffer", "cache:mask") then
             print("@error", "Failed to copy buffer")
             return
         end
     else
         if radius_x > 0 then
             local params = { sigma_x, radius_x, 1.0 / bw, 0.0 }
-            pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
-        elseif not copybuffer("tempbuffer", "cache:mask") then
+            pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
+        elseif not copybuffer("cache:mask", "tempbuffer") then
             print("@error", "Failed to copy buffer")
             return
         end
 
         if radius_y > 0 then
             local params = { sigma_y, radius_y, 0.0, 1.0 / bh }
-            pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "cache:mask", "tempbuffer", params, "copy", "clamp")
-        elseif not copybuffer("cache:mask", "tempbuffer") then
+            pixelshader("blur@GaussianBlur@${SCRIPT_NAME}", "tempbuffer", "cache:mask", params, "copy", "clamp")
+        elseif not copybuffer("tempbuffer", "cache:mask") then
             print("@error", "Failed to copy buffer")
             return
         end
     end
 
-    clearbuffer("tempbuffer", W, H)
-    pixelshader("rotate", "tempbuffer", "cache:mask", { c, -s, 0.0, 0.0, s, c, W, H }, "copy", "clamp")
-
     clearbuffer("cache:mask", W, H)
-    pixelshader(
-        "shift",
-        "cache:mask",
-        "tempbuffer",
-        { laca_r, laca_g, laca_b, should_enable_laca, offset * c / W, offset * s / H, channels },
-        "copy",
-        "clamp"
-    )
+    pixelshader("rotate", "cache:mask", "tempbuffer", { c, -s, 0.0, 0.0, s, c, W, H }, "copy", "clamp")
 
     pixelshader(
         "blend",

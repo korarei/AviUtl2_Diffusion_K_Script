@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.1
+
+- `ChannelBlur`と`Orton`エフェクトのアルファチャンネルの処理を修正
+
 ## v1.2.0
 
 > [!CAUTION]
