@@ -41,5 +41,5 @@ noise_hsla(float4 pos : SV_Position) : SV_Target {
     hsla.x = frac(hsla.x);
     const float4 rgba = hsla2rgba(saturate(hsla));
 
-    return saturate(float4(rgba.rgb * rgba.a, rgba.a));
+    return float4(rgba.rgb * rgba.a, rgba.a);
 }

@@ -26,12 +26,14 @@ noise(float4 pos : SV_Position) : SV_Target {
             break;
         case 2:
             src += r;
-            src.a = saturate(src.a);
             break;
         default:
             break;
     }
 
-    const float4 output = float4(max(src.rgb * src.a, 0.0), src.a);
-    return lerp(output, saturate(output), should_clamp);
+    src.a = saturate(src.a);
+    src.rgb = max(src.rgb, 0.0);
+
+    const float4 output = lerp(src, saturate(src), should_clamp);
+    return float4(output.rgb * output.a, output.a);
 }

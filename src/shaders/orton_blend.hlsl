@@ -74,6 +74,7 @@ blend(float4 pos : SV_Position) : SV_Target {
     const int mode = int(blend_mode);
 
     float4 src = max(tex[0].Load(int3(pos.xy, 0)), 0.0); // Linear
+    src.a = min(src.a, 1.0);
 
     if (int(alpha_mode) == 1)
         src = dissolve(src, pos.xy);
@@ -81,11 +82,12 @@ blend(float4 pos : SV_Position) : SV_Target {
     if (mode == -1) {
         src.rgb *= rcp(max(src.a, eps));
         src.rgb = pow(src.rgb, rcp(gamma));
-        src.rgb *= src.a;
-        return lerp(src, saturate(src), should_clamp);
+        const float4 output = lerp(src, saturate(src), should_clamp);
+        return float4(output.rgb * output.a, output.a);
     }
 
     float4 base = max(tex[1].Load(int3(pos.xy, 0)), 0.0); // Non-Linear
+    base.a = min(base.a, 1.0);
 
     if (mode == 0) {
         base.rgb *= rcp(max(base.a, eps));
@@ -97,9 +99,8 @@ blend(float4 pos : SV_Position) : SV_Target {
 
         output.rgb *= rcp(max(output.a, eps));
         output.rgb = pow(output.rgb, rcp(gamma));
-        output.rgb *= output.a;
-
-        return lerp(output, saturate(output), should_clamp);
+        output = lerp(output, saturate(output), should_clamp);
+        return float4(output.rgb * output.a, output.a);
     }
 
     src.rgb *= rcp(max(src.a, eps));
@@ -153,9 +154,8 @@ blend(float4 pos : SV_Position) : SV_Target {
     float a = mad(1.0 - base.a, src.a, base.a);
     rgb *= rcp(max(a, eps));
     rgb = pow(rgb, rcp(gamma));
-    rgb *= a;
 
-    const float4 output = float4(rgb, a) * (1.0 + (src.a - 1.0) * should_isolate_glow);
-
-    return lerp(output, saturate(output), should_clamp);
+    float4 output = float4(rgb, a) * (1.0 + (src.a - 1.0) * should_isolate_glow);
+    output = lerp(output, saturate(output), should_clamp);
+    return float4(output.rgb * output.a, output.a);
 }
