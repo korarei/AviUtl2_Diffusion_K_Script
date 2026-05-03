@@ -11,7 +11,7 @@
 
 ## 動作確認
 
-- [AviUtl ExEdit2 beta41](https://spring-fragrance.mints.ne.jp/aviutl/)
+- [AviUtl ExEdit2 beta43b](https://spring-fragrance.mints.ne.jp/aviutl/)
 
 > [!CAUTION]
 > beta41以降必須．
